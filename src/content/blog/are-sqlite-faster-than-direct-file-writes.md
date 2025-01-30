@@ -14,7 +14,7 @@ I benchmarked SQLite against direct file writes using a simple and controlled se
 When a files are written into by an application Linux doesn't directly write the files to the Secondary Storage. It writes it to an in-memory buffer called the page cache a.k.a disk cache. The goal of this cache is to minimize disk I/O by storing data in RAM that would otherwise require disk access.
 
 
-| ![image info](/images/databaseandosbuffers.drawio.png) |
+| ![image info](/databaseandosbuffers.drawio.png) |
 |:--:|
 | **Figure 1:** OS Page Cache, Database Pages and Secondary Storage |
 

@@ -132,7 +132,9 @@ This was obviously wayyyy faster than even SQLite.
 
 > Time taken for direct file writes = 390
 
-Thanks for reading. Hope you enjoyed it.
+Thanks for reading. Hope you enjoyed it. The code for all the experiments are written in rust and can be found [here](https://github.com/thehellmaker/systems-experiments/tree/main/sqlite-vs-direct-file-write).
+
+
 
 
 

@@ -1,4 +1,5 @@
 ---
+import { parseISO, format } from "date-fns";
 interface Props {
 	date: Date;
 }
@@ -7,11 +8,5 @@ const { date } = Astro.props;
 ---
 
 <time datetime={date.toISOString()}>
-	{
-		date.toLocaleDateString('en-us', {
-			year: 'numeric',
-			month: 'short',
-			day: 'numeric',
-		})
-	}
+	{format(parseISO(date.toISOString()), "LLL	dd, yyyy")}
 </time>

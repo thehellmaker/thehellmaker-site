@@ -20,7 +20,7 @@ When a files are written into by an application Linux doesn't directly write the
 
 Similar to page cache by OS, different databases often implement maintain their own in-memory buffers called pages which are used for further optimization of database I/O ([sequential and random I/O](https://vivekbansal.substack.com/p/sequential-vs-random-io)).
 
-## Experiment 1
+## Experiment 1 (Establish baseline)
 This experiment aims to compare the time taken to write 100k, 1M, and 10M rows directly into files and into SQLite database. In both cases the test is as shown below
 
 ### File write
@@ -98,7 +98,7 @@ I expected to see nothign as I was thinking SQLite is not writing to the DB at a
 - The .db-wal file was again empty after the script ended. This mean that SQLite was checkpointing the data during closing of SQLite connection.
 
 
-## Experiment 2
+## Experiment 2 (Check if SQLite is buferring in memory)
 I wanted to be doubly sure that SQLite was actually buffering data in memory during writes within a transaction so I decided to increase the looping to 10000000 and sleep for 20 seconds post every 1000000 writes and see during that time are there any WAL writes. VOILA there were no writes until some 800k writes which means that SQLite is buffering all writes in memory either until transaction commit happens or until some buffer is full. It gets even better
 - When the buffer gets full and the next 1000000 writes happen it doesn't fully flush its entire buffer to disk. Even though WAL is in binary format, the data was still in plain text I kept a track of max(i) in the "test{i}" that was written to the WAL every 1000000 writes and did a diff of max(i(n)) - max(i(n-1)) where i is the serial number of our loop and n and n-1 are the 2 runs of the loop before and after sleep. This diff that was getting written to WAL was exactly 1000000 on every successive 1000000 writes. 
 - The time it takes to write 1000000 while it was writing to in memory buffer was similar (2000 - 2500ms) and did not change after it started flusing to WAL. Which means that the thread that was flushing this buffer data to WAL was different from the thread that was writing into the buffer else the write time should have increased once the buffer was full.
@@ -124,13 +124,16 @@ transaction.commit()
 conn.close()
 ```
 
-## Experiment 3
+## Experiment 3 (In memory buffering for direct to file writes)
 Lastly I wanted to do the most obvious thing and modify direct file writes to keep data in memory and only write to the file at the end of the loop as shown below. 
 
 
 This was obviously wayyyy faster than even SQLite. 
 
 > Time taken for direct file writes = 390ms
+
+## Conclusing (SQLite does inmemory buffering of the data to make it look like its faster)
+SQLite indeed has some optimizations by buffering data in memory before even writing to a files and it would write data to file in a Queue fashion using multiple threads which makes it look like its faster than direct to file writes but not true in reality. However it does ensure durability at a transaction level with PRAGMA synchronous = FULL.
 
 Thanks for reading. Hope you enjoyed it. The code for all the experiments are written in rust and can be found [here](https://github.com/thehellmaker/systems-experiments/tree/main/sqlite-vs-direct-file-write).
 

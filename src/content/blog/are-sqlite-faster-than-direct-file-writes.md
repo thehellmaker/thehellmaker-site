@@ -1,7 +1,7 @@
 ---
 title: 'Are SQLite INSERTS faster than direct file writes?'
 description: "A standard benchmark by SQLite team shows SQLite INSERTS are 35% faster than direct filesystem writes. I explore the nuances of this blog"
-pubDate: 'Jan 27 2025'
+pubDate: 'Jan 31 2025'
 heroImage: '/blog-placeholder-3.jpg'
 ---
 

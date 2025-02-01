@@ -135,7 +135,7 @@ This was obviously wayyyy faster than even SQLite.
 ## Conclusing (SQLite does inmemory buffering of the data to make it look like its faster)
 SQLite indeed has some optimizations by buffering data in memory before even writing to a files and it would write data to file in a Queue fashion using multiple threads which makes it look like its faster than direct to file writes but not true in reality. However it does ensure durability at a transaction level with PRAGMA synchronous = FULL.
 
-Thanks for reading. Hope you enjoyed it. The code for all the experiments are written in rust and can be found [here](https://github.com/thehellmaker/systems-experiments/tree/main/sqlite-vs-direct-file-write).
+Thanks for reading. Hope you enjoyed it. The code for all the experiments are written in Rust and can be found [here](https://github.com/thehellmaker/systems-experiments/tree/main/sqlite-vs-direct-file-write).
 
 
 

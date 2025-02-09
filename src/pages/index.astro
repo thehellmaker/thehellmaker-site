@@ -1,4 +1,5 @@
 ---
+// Import necessary components and utilities
 import BaseHead from '../components/BaseHead.astro';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
@@ -6,9 +7,33 @@ import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
 import { getCollection } from 'astro:content';
 import FormattedDate from '../components/FormattedDate.astro';
 
-const posts = (await getCollection('blog')).sort(
-	(a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf(),
-);
+// Define a Post class to standardize blog post data structure
+class Post {
+	title: string;
+	url: string;
+	pubDate: Date;
+
+	constructor(title: string, url: string, pubDate: Date) {
+		this.title = title;
+		this.url = url;
+		this.pubDate = pubDate;
+	}
+}
+
+// Fetch internal blog posts from the content collection and transform them into Post objects
+let posts = (await getCollection('blog')).map((post) => new Post(post.data.title, `/blog/${post.id}/`, post.data.pubDate));
+
+// Define external blog posts that aren't part of the content collection
+let externalPosts = [
+	new Post('Event Loops, Multi-threading and Multi-processing', 'https://medium.com/@thehellmaker/event-loops-multi-threading-and-multi-processing-b57e65cf364f', new Date('2025-02-09')),
+]
+
+// Combine internal and external posts
+let unifiedPosts = [...posts, ...externalPosts];
+
+// Sort all posts by date, newest first
+unifiedPosts.sort((a, b) => b.pubDate.valueOf() - a.pubDate.valueOf());
+
 ---
 
 <!doctype html>
@@ -79,9 +104,10 @@ const posts = (await getCollection('blog')).sort(
 			<section>
 				<ul>
 					{
-						posts.map((post) => (
+						// Render each post with its date and title as a link
+						unifiedPosts.map((post) => (
 							<li>
-								<FormattedDate date={post.data.pubDate} />: <a href={`/blog/${post.id}/`}>{post.data.title}</a>
+								<FormattedDate date={post.pubDate} />: <a href={post.url}>{post.title}</a>
 							</li>
 						))
 					}

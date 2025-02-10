@@ -28,6 +28,7 @@ body {
 	font-size: 20px;
 	line-height: 3;
 }
+
 main {
 	width: 1280px;
 	max-width: calc(100% - 2em);
@@ -122,6 +123,9 @@ hr {
 	}
 	main {
 		padding: 1em;
+	}
+	ol {
+		padding-left: 1.5em;
 	}
 }
 

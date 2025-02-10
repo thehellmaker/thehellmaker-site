@@ -35,6 +35,11 @@ const { title, description, pubDate, updatedDate, heroImage } = Astro.props;
 				color: rgb(var(--gray-dark));
 				line-height: 2em;
 			}
+			@media (max-width: 720px) {
+				.prose {
+					line-height: 1.75em;
+				}
+			}
 			.title {
 				line-height: 1;
 			}

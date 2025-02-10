@@ -25,7 +25,7 @@ body {
 	word-wrap: break-word;
 	overflow-wrap: break-word;
 	color: rgb(var(--gray-dark));
-	font-size: 16px;
+	font-size: 20px;
 	line-height: 3;
 }
 main {
@@ -41,7 +41,7 @@ h3,
 h4,
 h5,
 h6 {
-	margin: 0 0 0.5rem 0;
+	margin: 2em 0 1em 0;
 	color: rgb(var(--black));
 	line-height: 1.2;
 }
@@ -49,13 +49,13 @@ h1 {
 	font-size: 2em;
 }
 h2 {
-	font-size: 1.8em;
+	font-size: 1.5em;
 }
 h3 {
-	font-size: 1.6em;
+	font-size: 1.25em;
 }
 h4 {
-	font-size: 1.3em;
+	font-size: 1.1em;
 }
 h5 {
 	font-size: 1em;
@@ -79,13 +79,14 @@ p {
 }
 textarea {
 	width: 100%;
-	font-size: 16px;
+	font-size: 20px;
 }
 input {
-	font-size: 16px;
+	font-size: 20px;
 }
 table {
 	width: 100%;
+	margin: 3.5em 0;
 }
 img {
 	max-width: 100%;
@@ -100,6 +101,7 @@ code {
 pre {
 	padding: 1.5em;
 	border-radius: 8px;
+	margin: 2em 0;
 }
 pre > code {
 	all: unset;

@@ -4,10 +4,11 @@ import BaseHead from '../components/BaseHead.astro';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import FormattedDate from '../components/FormattedDate.astro';
-
+import { User, users } from '../consts';
 type Props = CollectionEntry<'blog'>['data'];
 
-const { title, description, pubDate, updatedDate, heroImage } = Astro.props;
+const { title, description, pubDate, updatedDate, heroImage, authors } = Astro.props;
+const authorUsers = Astro.props.authors.map((author) => users.get(author)).filter((author): author is User => author !== undefined);
 ---
 
 <html lang="en">
@@ -46,12 +47,40 @@ const { title, description, pubDate, updatedDate, heroImage } = Astro.props;
 			.title h1 {
 				margin: 0 0 0.5em 0;
 			}
+			.author {
+				display: flex;
+				gap: 1rem;
+			}
+			.author img {
+				width: 60px;
+				height: 60px;
+				border-radius: 50%;
+				object-fit: cover;
+			}
+			.author-info {
+				display: flex;
+				flex-direction: column;
+				justify-content: center;
+			}
+			.author-info h2 {
+				font-size: 1.2rem;
+				margin: 0;
+				color: rgb(var(--gray-dark));
+			}
+			.author-info .meta-info {
+				display: flex;
+				flex-direction: column;
+				gap: 0.5rem;
+			}
 			.date {
-				margin-bottom: 0.5em;
+				margin-top: 10px;
+				margin-bottom: 0;
+				font-size: 1rem;
 				color: rgb(var(--gray));
 			}
 			.last-updated-on {
 				font-style: italic;
+				font-size: 0.8rem;
 			}
 		</style>
 	</head>
@@ -60,21 +89,31 @@ const { title, description, pubDate, updatedDate, heroImage } = Astro.props;
 		<Header />
 		<main>
 			<article>
-				<!-- <div class="hero-image">
-					{heroImage && <img width={1020} height={510} src={heroImage} alt="" />}
-				</div> -->
 				<div class="prose">
+					
 					<div class="title">
 						<h1>{title}</h1>
-						<div class="date">
-							<FormattedDate date={pubDate} />
-							{
-								updatedDate && (
-									<div class="last-updated-on">
-										Last updated on <FormattedDate date={updatedDate} />
+						<div class="author">
+							{authorUsers.map((author) => (
+								<div class="author">
+									<img src={author.image} alt={author.name} />
+									<div class="author-info">
+										<h2>{author.name}</h2>
+										<div class="meta-info">
+											<div class="date">
+												<FormattedDate date={pubDate} />
+												{
+													updatedDate && (
+														<div class="last-updated-on">
+															Last updated on <FormattedDate date={updatedDate} />
+														</div>
+													)
+												}
+											</div>
+										</div>
 									</div>
-								)
-							}
+								</div>
+							))}
 						</div>
 					</div>
 					<slot />

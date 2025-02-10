@@ -6,26 +6,37 @@ import Footer from '../components/Footer.astro';
 import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
 import { getCollection } from 'astro:content';
 import FormattedDate from '../components/FormattedDate.astro';
+import { User, users } from '../data/users';
 
 // Define a Post class to standardize blog post data structure
 class Post {
 	title: string;
 	url: string;
 	pubDate: Date;
+	authors: User[];
 
-	constructor(title: string, url: string, pubDate: Date) {
+	constructor(title: string, url: string, pubDate: Date, authors: User[]) {
 		this.title = title;
 		this.url = url;
 		this.pubDate = pubDate;
+		this.authors = authors;
 	}
 }
 
 // Fetch internal blog posts from the content collection and transform them into Post objects
-let posts = (await getCollection('blog')).map((post) => new Post(post.data.title, `/blog/${post.id}/`, post.data.pubDate));
+let posts = (await getCollection('blog')).map((post) => {
+	const authors = post.data.authors
+		.map((author) => users.get(author))
+		.filter((author): author is User => author !== undefined);
+	return new Post(post.data.title, `/blog/${post.id}/`, post.data.pubDate, authors);
+});
 
 // Define external blog posts that aren't part of the content collection
 let externalPosts = [
-	new Post('Event Loops, Multi-threading and Multi-processing', 'https://medium.com/@thehellmaker/event-loops-multi-threading-and-multi-processing-b57e65cf364f', new Date('2025-02-09')),
+	new Post('Event Loops, Multi-threading and Multi-processing', 'https://medium.com/@thehellmaker/event-loops-multi-threading-and-multi-processing-b57e65cf364f', new Date('2025-02-09'), [
+		users.get('thehellmaker')!,
+		users.get('rajsiba')!,
+	]),
 ]
 
 // Combine internal and external posts
@@ -53,7 +64,7 @@ unifiedPosts.sort((a, b) => b.pubDate.valueOf() - a.pubDate.valueOf());
 				padding: 0;
 			}
 			ul li {
-				width: calc(50% - 1rem);
+				width: 100%;
 			}
 			ul li * {
 				text-decoration: none;

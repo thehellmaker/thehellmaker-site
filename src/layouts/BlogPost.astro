@@ -48,12 +48,12 @@ const authorUsers = Astro.props.authors
 				line-height: 1;
 			}
 			.title h1 {
-				margin: 0 0 0.5em 0;
+				margin: 0 0 0 0;
 			}
 			.author {
 				display: flex;
 				gap: 1rem;
-				margin-top: 20px;
+				margin-top: 10px;
 			}
 			.author img {
 				width: 60px;
@@ -71,13 +71,16 @@ const authorUsers = Astro.props.authors
 				margin: 0;
 				color: rgb(var(--gray-dark));
 			}
+			.author-bio {
+				font-size: 0.9rem;
+				color: rgb(var(--gray));
+			}
 			.author-info .meta-info {
 				display: flex;
 				flex-direction: column;
 				gap: 0.5rem;
 			}
 			.date {
-				margin-top: 10px;
 				margin-bottom: 0;
 				font-size: 1rem;
 				color: rgb(var(--gray));
@@ -96,39 +99,35 @@ const authorUsers = Astro.props.authors
 				<div class="prose">
 					<div class="title">
 						<h1>{title}</h1>
-						<div class="author">
-							{
-								authorUsers.map((author) => (
-									<div class="author">
-										<img
-											src={author.image}
-											alt={author.name}
-										/>
-										<div class="author-info">
-											<h2>{author.name}</h2>
-											<div class="meta-info">
-												<div class="date">
-													<FormattedDate
-														date={pubDate}
-													/>
-													{updatedDate && (
-														<div class="last-updated-on">
-															Last updated on{" "}
-															<FormattedDate
-																date={
-																	updatedDate
-																}
-															/>
-														</div>
-													)}
-												</div>
-											</div>
+					</div>
+					<div class="date">
+						<FormattedDate date={pubDate} />
+						{updatedDate && (
+							<div class="last-updated-on">
+								Last updated on{" "}
+								<FormattedDate date={updatedDate} />
+							</div>
+						)}
+					</div>
+					<div class="author">
+						{
+							authorUsers.map((author) => (
+								<div class="author">
+									<img
+										src={author.image}
+										alt={author.name}
+									/>
+									<div class="author-info">
+										<h2>{author.name}</h2>
+										<div class="author-bio">
+											{author.bio}
 										</div>
 									</div>
-								))
-							}
-						</div>
+								</div>
+							))
+						}
 					</div>
+					
 					<slot />
 				</div>
 			</article>

@@ -12,9 +12,9 @@ authors: ['thehellmaker']
 ## Introduction
 Databases rely on Write-Ahead Logging (WAL) to ensure durability and performance. When a database processes a write request, it often appends the change to a sequential log called WAL before applying it to the actual database storage. This approach enables databases to acknowledge writes faster, ensuring both durability and performance. 
 
-| ![image info](/WALBeforeDBUpdate.drawio.png) |
+| ![image info](/WALBeforeDBUpdate.excalidraw.png) |
 |:--:|
-| **[Figure 1](/WALBeforeDBUpdate.drawio):** First update WAL and then update DB |
+| **[Figure 1](/WALBeforeDBUpdate.excalidraw):** First update WAL and then update DB |
 
 ## How is it faster than direct writes to db files?
 Writes to a WAL is Faster than writes to DB for the following reasons

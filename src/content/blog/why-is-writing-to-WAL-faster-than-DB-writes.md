@@ -43,9 +43,9 @@ Consider an application performing the following update operations:
 
 3. **UPDATE (3, Sindhu, Address3.1)** – Updating the address of the record with ID 3.
 
-| ![image info](/DBSequentialvsRandomIO.drawio.png) |
+| ![image info](/DBSequentialvsRandomIO.excalidraw.png) |
 |:--:|
-| **[Figure 2](/DBSequentialvsRandomIO.drawio):** First update WAL and then update DB |
+| **[Figure 2](/DBSequentialvsRandomIO.excalidraw):** First update WAL and then update DB |
 
 ##### How these updates are handled in WAL
 When these updates are executed, they are first appended sequentially to the WAL file:
@@ -89,7 +89,7 @@ Each update operation must:
 
 5. Modify transaction metadata to ensure durability.
 
-These updates occur at different locations on disk, leading to random writes. 
+These updates occur at different locations on disk, leading to random writes which are more timeconsuming and inefficient compared to sequential append only I/O. This is also shown in Figure 2. where the single primary write to WAL leads to multiple auxilliary writes to other pages in the databases.
 
 ## Is WAL always faster?
 

@@ -33,9 +33,12 @@ let posts = (await getCollection('blog')).map((post) => {
 
 // Define external blog posts that aren't part of the content collection
 let externalPosts = [
-	new Post('Event Loops, Multi-threading and Multi-processing', 'https://medium.com/@thehellmaker/event-loops-multi-threading-and-multi-processing-b57e65cf364f', new Date('2025-02-09'), [
+	new Post('Event Loops, Multi-threading and Multi-processing', '/blog/event-loops-multi-threading-and-multi-processing', new Date('2025-02-09'), [
 		users.get('thehellmaker')!,
 		users.get('rajsiba')!,
+	]),
+	new Post('Setting Up DeepSeek-R1 671B for Distributed Multi-Node, Multi-GPU Inference with VLLM and Ray', '/blog/how-deploy-deepseek-r1-671b-model-multi-node-multi-gpu-using-vllm-ray-cluster', new Date('2025-02-16'), [
+		users.get('thehellmaker')!,
 	]),
 ]
 

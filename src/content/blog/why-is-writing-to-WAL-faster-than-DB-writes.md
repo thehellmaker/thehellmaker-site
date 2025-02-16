@@ -1,7 +1,6 @@
 ---
 title: 'Why is writing to WAL (Write Ahead Log) faster than DB writes?'
-description: "Databases often write to WAL, on single or multiple machines, and then return to the clients 
-confirming the writes. How is writing to WAL durable and why is it faster than writing to database?"
+description: "Databases often write to WAL, on single or multiple machines, and then return to the clients confirming the writes. How is writing to WAL durable and why is it faster than writing to database?"
 pubDate: 'Feb 2 2025'
 tags: 'os, database'
 group: 'systems'

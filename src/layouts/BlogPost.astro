@@ -9,7 +9,8 @@ type Props = CollectionEntry<"blog">["data"];
 
 const { title, description, pubDate, updatedDate, heroImage, authors } =
 	Astro.props;
-const authorUsers = Astro.props.authors
+
+const authorUsers = authors
 	.map((author) => users.get(author))
 	.filter((author): author is User => author !== undefined);
 ---

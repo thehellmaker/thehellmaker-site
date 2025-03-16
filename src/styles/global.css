@@ -1,3 +1,8 @@
+@import "katex/dist/katex.min.css";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 /*
   The CSS in this style tag is based off of Bear Blog's default CSS.
   https://github.com/HermanMartinus/bearblog/blob/297026a877bc2ab2b3bdfbd6b9f7961c350917dd/templates/styles/blog/default.css
@@ -14,6 +19,11 @@
 	--gray-gradient: rgba(var(--gray-light), 50%), #fff;
 	--box-shadow: 0 2px 6px rgba(var(--gray), 25%), 0 8px 24px rgba(var(--gray), 33%),
 		0 16px 32px rgba(var(--gray), 33%);
+	--table-header-bg: #000;
+	--table-row-even: #f3f4f6;
+	--table-row-odd: #ffffff;
+	--table-border: #dddddd;
+	--table-hover: #e5e7eb;
 }
 
 body {
@@ -26,14 +36,14 @@ body {
 	overflow-wrap: break-word;
 	color: rgb(var(--gray-dark));
 	font-size: 20px;
-	line-height: 3;
+	line-height: 3em;
 }
 
 main {
 	width: 1280px;
-	max-width: calc(100% - 2em);
+	max-width: calc(100%);
 	margin: auto;
-	padding: 2em 1em;
+	padding: 2em 0em;
 }
 
 h1,
@@ -45,6 +55,7 @@ h6 {
 	margin: 2em 0 1em 0;
 	color: rgb(var(--black));
 	line-height: 1.2;
+	font-weight: bold;
 }
 h1 {
 	font-size: 2em;
@@ -87,7 +98,41 @@ input {
 }
 table {
 	width: 100%;
-	margin: 3.5em 0;
+	margin: 2rem 0;
+	border-collapse: collapse;
+	font-size: 0.9em;
+	box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
+	border-radius: 8px;
+	overflow: hidden;
+}
+/* Table header styling */
+thead tr {
+	background-color: var(--table-header-bg);
+	color: white;
+	text-align: left;
+	font-weight: bold;
+}
+/* Cell padding */
+th, td {
+	padding: 12px 15px;
+}
+/* Alternating row colors */
+tbody tr {
+	border-bottom: 1px solid var(--table-border);
+}
+tbody tr:nth-of-type(even) {
+	background-color: var(--table-row-even);
+}
+tbody tr:nth-of-type(odd) {
+	background-color: var(--table-row-odd);
+}
+/* Last row bottom border */
+tbody tr:last-of-type {
+	border-bottom: 2px solid var(--table-header-bg);
+}
+/* Hover effect */
+tbody tr:hover {
+	background-color: var(--table-hover);
 }
 img {
 	max-width: 100%;
@@ -127,6 +172,13 @@ hr {
 	ol {
 		padding-left: 1.5em;
 	}
+	/* Adjust table for mobile */
+	table {
+		font-size: 0.8em;
+	}
+	th, td {
+		padding: 8px 10px;
+	}
 }
 
 .sr-only {
@@ -145,4 +197,11 @@ hr {
 	clip-path: inset(50%);
 	/* added line to stop words getting smushed together (as they go onto separate lines and some screen readers do not understand line feeds as a space */
 	white-space: nowrap;
+}
+
+
+ul {
+	list-style-type: disc;
+	margin-left: 1.5em;
+	margin-bottom: 1.5em;
 }

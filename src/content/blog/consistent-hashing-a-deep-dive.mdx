@@ -1,0 +1,333 @@
+---
+title: 'Understanding Consistent Hashing: A Visual Guide for Distributed Database Design'
+description: "Discover how consistent hashing solves distribution challenges in scalable systems. This visual guide explains the algorithm with step-by-step diagrams, practical examples, and interactive demonstrations. Learn why companies like Amazon, Netflix, and Discord rely on consistent hashing for their distributed databases and caching layers."
+pubDate: 'Mar 16 2025'
+tags: 'os, database'
+group: 'systems'
+heroImage: '/blog-placeholder-3.jpg'
+authors: ['thehellmaker']
+---
+import ConsistentHashing from '../../components/consistent-hashing/ConsistentHashing.tsx';
+
+## Introduction
+
+### Overview of Consistent Hashing
+
+Consistent hashing is a critical technique in distributed systems for distributing data across nodes in a balanced and scalable manner. Unlike traditional hashing mechanisms, which can cause massive reallocation of keys when nodes join or leave, consistent hashing minimizes disruption by using a circular hash ring.
+
+### Purpose of the Blog
+
+Most discussions on consistent hashing focus on basic principles, but this blog will provide a deep technical dive, covering:
+
+- How nodes and virtual nodes are mapped onto the hash ring.
+- Partitioning and how each node maintains a node-to-partition map.
+- Replication across K nodes in a clockwise order.
+- Handling node addition and deletion.
+- How the gossip protocol keeps all nodes aware of the cluster state.
+- The role of coordinator nodes in client interactions.
+- Why gossip is separate from data replication.
+- Step-by-step examples illustrating these concepts in action.
+
+## Basics of Consistent Hashing
+
+### Hash Ring and Node Placement
+A consistent hash ring is a circular key space. In the general model, the ring spans values from 0 to (2³²–1) (i.e. 0 to 4,294,967,295). Each node and data item is mapped onto this ring using a hash function. For instance, a node's identifier is hashed, and its position on the ring is computed as:
+
+<div style={{ display: 'flex', justifyContent: 'center', width: '100%', margin: '2rem 0' }}>
+  $$hash(node\_identifier) \mod (2^{32} - 1)$$
+</div>
+
+Data items are also hashed, and each item is stored on the first node encountered in the clockwise direction from its hash.
+
+### Virtual Nodes
+
+To prevent load hotspots and ensure even distribution, each physical node is assigned multiple virtual nodes. 
+Each virtual node's hash value is computed by hashing a composite key (e.g., "A-1", "A-2", "A-3" for Node A) and then 
+taking the result modulo (2³² – 1). The positions of these virtual nodes are determined solely by their hash values, which naturally spreads them non-contiguously across the large hash space.
+
+### Server Side: Consistent Hashing & Partition Management
+
+#### Step 1: Cluster Start State
+
+Consider a cluster with three physical nodes (A, B, and C), each hosting three virtual nodes. Using a hash function that outputs values in the range 0 to 2³² – 1, the virtual node positions are determined by:
+
+| Node ID | VNode ID | Hash Formula |
+|---------|---------|-------------|
+| A       | A-1    | hash("A-1") mod (2³² – 1) |
+| A       | A-2    | hash("A-2") mod (2³² – 1) |
+| A       | A-3    | hash("A-3") mod (2³² – 1) |
+| B       | B-1    | hash("B-1") mod (2³² – 1) |
+| B       | B-2    | hash("B-2") mod (2³² – 1) |
+| B       | B-3    | hash("B-3") mod (2³² – 1) |
+| C       | C-1    | hash("C-1") mod (2³² – 1) |
+| C       | C-2    | hash("C-2") mod (2³² – 1) |
+| C       | C-3    | hash("C-3") mod (2³² – 1) |
+
+
+#### Step 2: Partition Table
+After computing these values, the virtual nodes are sorted in ascending order along the ring. 
+Each virtual node is then responsible for the key range between its previous node's hash value and 
+its own hash value.
+
+| Partition | Hash Range          | Virtual Node | Real Node |
+|-----------|---------------------|--------------|-----------|
+| P1        | 0x00000000 - 0x12FFFFFF | B-1  | Node B   |
+| P2        | 0x13000000 - 0x25FFFFFF | A-2  | Node A   |
+| P3        | 0x26000000 - 0x38FFFFFF | C-1  | Node C   |
+| P4        | 0x39000000 - 0x4BFFFFFF | A-1  | Node A   |
+| P5        | 0x4C000000 - 0x5EFFFFFF | B-2  | Node B   |
+| P6        | 0x5F000000 - 0x71FFFFFF | C-2  | Node C   |
+| P7        | 0x72000000 - 0x83FFFFFF | A-3  | Node A   |
+| P8        | 0x84000000 - 0x95FFFFFF | C-3  | Node C   |
+| P9        | 0x96000000 - 0xFFFFFFFF | B-3  | Node B   |
+
+
+#### Step 3: Sync the partition table to all nodes using Gossip Protocol
+The gossip protocol is used to synchronize the partition table across all nodes. Since there's no centralized metadata service, nodes must exchange information peer-to-peer.
+
+##### How Gossip Protocol Works
+- Each node maintains a copy of the **partition table**.
+- Nodes **periodically** communicate with a **few random peers**.
+- **New updates (e.g., node joins, failures)** are propagated across the cluster.
+- Eventually, **all nodes converge** on the same partition mapping.
+
+**Example: Node A Gossips to Node B**
+- **Node A** updates its partition table **(e.g., detects a new node, Node D)**.
+- **Node A** shares the updated partition table with **Node B**.
+- **Node B** updates itself and gossips the information to **Node C**.
+- Eventually, **all nodes learn** about the change.
+
+Gossip ensures that all nodes eventually have a consistent view of partition ownership without relying on a central service.
+
+#### Step 4: How Adding or Deleting Nodes Updates the Partition Table?
+When a node is added or removed, the partition table must be updated and synchronized across the cluster.
+
+##### Adding a New Node
+- The new node advertises itself using gossip.
+- The cluster reassigns partitions to distribute load.
+- Affected nodes migrate data to the new node.
+- The updated partition table is gossiped to all nodes.
+
+###### Before Adding Node D (Previous partition table without Node D)
+
+| Partition | Hash Range          | Virtual Node | Real Node |
+|-----------|---------------------|--------------|-----------|
+| P1        | 0x00000000 - 0x12FFFFFF | B-1  | Node B   |
+| P2        | 0x13000000 - 0x25FFFFFF | A-2  | Node A   |
+| P3        | 0x26000000 - 0x38FFFFFF | C-1  | Node C   |
+| P4        | 0x39000000 - 0x4BFFFFFF | A-1  | Node A   |
+| P5        | 0x4C000000 - 0x5EFFFFFF | B-2  | Node B   |
+| P6        | 0x5F000000 - 0x71FFFFFF | C-2  | Node C   |
+| P7        | 0x72000000 - 0x83FFFFFF | A-3  | Node A   |
+| P8        | 0x84000000 - 0x95FFFFFF | C-3  | Node C   |
+| P9        | 0x96000000 - 0xFFFFFFFF | B-3  | Node B   |
+
+
+###### After Adding Node D
+Now we introduce Node D, with three new vnodes (D-1, D-2, D-3), ensuring a balanced redistribution of hash ranges:
+
+| Partition | Hash Range          | Virtual Node | Real Node |
+|-----------|---------------------|--------------|-----------|
+| P1        | 0x00000000 - 0x0AFFFFFF | B-1  | Node B   |
+| P2        | 0x0B000000 - 0x15FFFFFF | D-1  | Node D   |
+| P3        | 0x16000000 - 0x25FFFFFF | A-2  | Node A   |
+| P4        | 0x26000000 - 0x30FFFFFF | C-1  | Node C   |
+| P5        | 0x31000000 - 0x3EFFFFFF | D-2  | Node D   |
+| P6        | 0x3F000000 - 0x4BFFFFFF | A-1  | Node A   |
+| P7        | 0x4C000000 - 0x58FFFFFF | B-2  | Node B   |
+| P8        | 0x59000000 - 0x65FFFFFF | C-2  | Node C   |
+| P9        | 0x66000000 - 0x72FFFFFF | D-3  | Node D   |
+| P10       | 0x73000000 - 0x83FFFFFF | A-3  | Node A   |
+| P11       | 0x84000000 - 0x95FFFFFF | C-3  | Node C   |
+| P12       | 0x96000000 - 0xFFFFFFFF | B-3  | Node B   |
+
+##### Removing a Node
+When a node is removed from the consistent hashing ring, its partitions are not deleted; instead, they are reassigned to the next available virtual node in the clockwise direction. This ensures minimal disruption to the cluster while maintaining data availability.
+
+**1. Identify the Virtual Nodes of the Removed Node**
+
+Each real node owns multiple virtual nodes. When a node is removed, all of its virtual nodes disappear from the ring.
+Example: Removing Node D (which had virtual nodes D-1, D-2, and D-3) means their respective partitions need reassignment.
+
+**2. Find the Next Virtual Node in the Clockwise Direction**
+
+Each affected partition is reassigned to the next virtual node in the ring.
+The next virtual node must belong to a different real node.
+
+**3. Reassign Partitions to New Virtual Nodes**
+
+- **P5 (D-1 → A-2)** → The next vnode **A-2** takes over the partition previously assigned to **D-1**.
+- **P10 (D-2 → A-1)** → The next vnode **A-1** takes over D-2's partition.
+- **P12 (D-3 → A-3)** → The next vnode **A-3** takes over D-3's partition.
+
+The reassignment ensures minimal movement of keys, reducing the load on the system. Clients querying the cluster will experience no downtime, as the partition assignments are quickly updated.
+
+| Partition | Hash Range          | Virtual Node | Real Node |
+|-----------|---------------------|--------------|-----------|
+| P1        | 0x00000000 - 0x0AFFFFFF | B-1  | Node B   |
+| P2        | 0x0B000000 - 0x15FFFFFF | **A-2 (Replaces D-1)**  | Node A   |
+| P3        | 0x16000000 - 0x25FFFFFF | A-2  | Node A   |
+| P4        | 0x26000000 - 0x30FFFFFF | C-1  | Node C   |
+| P5        | 0x31000000 - 0x3EFFFFFF | **A-1 (Replaces D-2)**  | Node B   |
+| P6        | 0x3F000000 - 0x4BFFFFFF | A-1  | Node A   |
+| P7        | 0x4C000000 - 0x58FFFFFF | B-2  | Node B   |
+| P8        | 0x59000000 - 0x65FFFFFF | C-2  | Node C   |
+| P9        | 0x66000000 - 0x72FFFFFF | **A-3 (Replaces D-3)**  | Node C   |
+| P10       | 0x73000000 - 0x83FFFFFF | A-3  | Node A   |
+| P11       | 0x84000000 - 0x95FFFFFF | C-3  | Node C   |
+| P12       | 0x96000000 - 0xFFFFFFFF | B-3  | Node B   |
+
+Adding or removing a node does NOT require a full rehash—only a few partitions are reassigned, making the process efficient.
+
+
+#### Partition Replication in Consistent Hashing
+Consistent hashing ensures that data is not lost when nodes join or leave by using replication. Each partition is replicated to the next K nodes in the clockwise direction of the ring. This ensures fault tolerance and allows data retrieval even if some nodes fail.
+
+##### How Replication Works
+
+**1. Primary Node Ownership:**
+
+Each partition has a primary owner based on the consistent hashing scheme.
+Example: If P1 (0x00000000 - 0x0EFFFFFF) is owned by B-1, it is the primary node for that partition.
+
+**2. Replication to Next K Nodes:**
+
+The next K nodes in the ring (typically K=2 or 3) store replica copies of the partition.
+These replicas ensure that even if the primary node fails, data remains available.
+
+**3. Read and Write Behavior:**
+
+Writes are typically performed on all replicas, but only confirmed after a quorum of nodes acknowledge the write.
+Reads can be served from any replica to distribute load and improve availability.
+
+##### Example: Partition Replication in a Cluster (K=2 Replicas)
+Below is an example where each partition has two replicas stored on the next two nodes in the ring.
+
+| Partition | Hash Range | Primary Node | Replica 1 | Replica 2 |
+|-----------|------------|--------------|------------|------------|
+| P1        | 0x00000000 - 0x15555555 | B-1 | A-2 | C-1 |
+| P2        | 0x15555556 - 0x2AAAAAAA | A-2 | C-1 | A-1 |
+| P3        | 0x2AAAAAAB - 0x3FFFFFFF | C-1 | A-1 | C-2 |
+| P5        | 0x55555556 - 0x6AAAAAAA | A-1 | C-2 | A-3 |
+| P6        | 0x6AAAAAAB - 0x7FFFFFFF | C-2 | A-3 | C-3 |
+| P7        | 0x80000000 - 0x95555555 | A-3 | C-3 | B-3 |
+| P8        | 0x95555556 - 0xAAAAAAA9 | C-3 | B-3 | B-1 |
+| P9        | 0xAAAAAAA9 - 0xBFFFFFFF | B-3 | B-1 | A-2 |
+
+**How Replication Helps in Failure Recovery**
+
+**1. If B-1 Fails:**
+
+- **P1 (Primary: B-1)** → Served by **A-2** **(Replica 1)** or **C-1** **(Replica 2)**
+- Query to P1 will now contact A-2 or C-1 without data loss.
+
+**2. If C-1 Fails:**
+
+- **P3 (Primary: C-1)** → Served by **A-1** or **B-2**
+- **P14 (Primary: C-1)** → Served by **B-1** or **C-2**
+- Data is still available from replicas.
+
+#### Hash Ring And Partitions Visualization
+
+<ConsistentHashing client:only="react" />
+
+
+### Client Side: Consistent Hashing & Partition Management
+
+#### Step 1: Client Discovers the Coordinator Nodes
+
+**1. Client Starts with a Predefined List of Nodes**
+- The client is configured with a seed list—a small subset of known nodes in the cluster.
+- These nodes act as initial contact points but are not necessarily special or leaders.
+
+**2. Client Queries a Seed Node for Coordinator Nodes**
+- The client picks one seed node and requests cluster metadata.
+- The node responds with:
+  - A list of coordinator nodes responsible for handling requests.
+  - Basic cluster state (e.g., active nodes) but not the partition table.
+
+**3. Client Routes Requests via Coordinators**
+- The client does not track partitions or hash keys itself.
+- Instead, it forwards all requests to a coordinator, which determines the correct node.
+- If replication is enabled, the coordinator ensures the request is forwarded to backup nodes.
+
+**4. Automatic Failover and Updates**
+- If a queried coordinator fails, the client tries another node from its known list.
+- The client does not participate in gossip and does not directly track cluster changes.
+- When necessary, it can query a seed node again to refresh its list of coordinators.
+
+#### Step 2: Coordinator Nodes
+
+In a cluster all nodes can be coordinators (which is the most common case in cassandra, cockroachdb etc...)
+or a subset of nodes can be coordinators. It routes requests to the correct partition owner.
+
+Example:
+
+- Client contacts Node A.
+- A routes request to partition owner (e.g., Node C).
+- Response is sent back via A.
+
+#### Step 3: How does the coordinator node know which node to route the request to?
+Every key (e.g., "user_123", "order_456") is hashed using a consistent hash function (e.g., MurmurHash, MD5, SHA-1). 
+This hash function produces a numerical value that falls within a fixed hash space 
+(e.g., 0 to 2³² - 1 for a 32-bit hash).
+
+**Example**
+For the key "user_123", applying a hash function might give:
+
+```python
+hash("user_123") = 0xA132EDED
+```
+
+
+#### Step 4: Find the Partition and the Node for the Key
+- The hash ring is divided into **partitions** (logical segments of the hash space).
+- Each partition is assigned to a **virtual node (VNode)**, and each virtual node is mapped to a **real node**
+- The coordinator node checks where the hash falls in the partition table
+
+**Example: Partition Table**
+| Partition | Hash Range          | Virtual Node | Real Node |
+|-----------|---------------------|--------------|-----------|
+| P1        | 0x00000000 - 0x12FFFFFF | B-1  | Node B   |
+| P2        | 0x13000000 - 0x25FFFFFF | A-2  | Node A   |
+| P3        | 0x26000000 - 0x38FFFFFF | C-1  | Node C   |
+| P4        | 0x39000000 - 0x4BFFFFFF | A-1  | Node A   |
+| P5        | 0x4C000000 - 0x5EFFFFFF | B-2  | Node B   |
+| P6        | 0x5F000000 - 0x71FFFFFF | C-2  | Node C   |
+| P7        | 0x72000000 - 0x83FFFFFF | A-3  | Node A   |
+| P8        | 0x84000000 - 0x95FFFFFF | C-3  | Node C   |
+| P9        | 0x96000000 - 0xFFFFFFFF | B-3  | Node B   |
+
+- Since `0xA132EDED` falls in **P9**, it is assigned to vnode **B-3** which maps to real node **Node B**.
+
+#### Step 5: Coordinator Node sends the request to the correct node
+When the coordinator node forwards a request to the correct node, it usually does not send just the hash of the key. Instead, it sends:
+
+| Field | Sent in Request? | Purpose |
+| --- | --- | --- |
+| Key (user_123) | ✅ Yes | The actual key for retrieval or storage. |
+| Key Hash (0xA132) | ❌ No (optional) | The key used to store the mapping in the coordinator nodes not the hash of the key. And secondly if required the target node can recompute the hash of the key. |
+| Partition ID (e.g., P3) | ✅ Yes | Indicates which partition the key belongs to. |
+| Operation Type (GET / PUT / DELETE) | ✅ Yes | Defines whether the request is a read, write, or delete operation. |
+| Replication Info (if applicable) | ✅ Yes | Used for replication purposes. |
+| Timestamp / Version (Optional) | ✅ Yes | Ensures consistency in distributed systems. |
+
+#### Why is the key sent instead of just the hash? 
+* The **target node** needs the original key to access the **storage engine (e.g., SSTable, B-Tree, or LSM-Tree)**. 
+This is because the hash can disrupt the ordering of the keys and the locality of reference depending of the type of index being used. This might make the queries more inefficient. 
+* Since the **target node** is the one that has the data, it queries the right partition for the key and returns the data to the coordinator node.
+
+##### Step 6: Coordinator Node returns the data to the client
+The node responds with the data to the coordinator node and the coordinator node returns the data to the client. If the data is not found the coordinator node will return an error back to the client.
+
+
+## Conclusion
+In this post, we explored how consistent hashing distributes partitions across nodes, how gossip protocol ensures state synchronization, and how clients interact with the cluster. By separating cluster state management from data replication, the system remains scalable and resilient.
+
+Consistent hashing is the backbone of many distributed systems, including  Cassandra, CockroachDB, and modern caching layers like Redis Cluster.
+
+Hope you enjoyed the post. If you have any questions or feedback, please write to me on any the medium in contact page.
+
+
+
+

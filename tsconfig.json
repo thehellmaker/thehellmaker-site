@@ -1,10 +1,14 @@
 {
-  "extends": "astro/tsconfigs/strict",
-  "include": [".astro/types.d.ts", "**/*"],
-  "exclude": ["dist"],
   "compilerOptions": {
-    "strictNullChecks": true,
+    "target": "es2015",
+    "lib": ["es2015", "dom"],
     "jsx": "react-jsx",
-    "jsxImportSource": "react"
+    "module": "esnext",
+    "moduleResolution": "node",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "types": ["react", "react-dom"]
   }
 }

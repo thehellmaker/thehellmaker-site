@@ -24,6 +24,6 @@ export const treeStructure: TreeStructure = {
   11: ["uuid-55"]
 }; 
 
-export const SEQUENTIAL_ACCESS_SEQUENCE_FOR_CACHE_MISS_SIMULATION = ["1", "2", "3", "4", "5", "6", "7"];
+export const SEQUENTIAL_ACCESS_SEQUENCE_FOR_CACHE_MISS_SIMULATION = ["1", "4", "7", "3", "6", "2", "5"];
 
 export const SEQUENTIAL_ACCESS_SEQUENCE_FOR_CACHE_HIT_SIMULATION = ["1", "2", "3", "4"];

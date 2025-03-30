@@ -39,6 +39,13 @@ const authorUsers = authors
 				margin: auto;
 				color: rgb(var(--gray-dark));
 				line-height: 2em;
+				font-feature-settings: "tnum", "lnum";
+			}
+			.prose p, .prose li, .prose ol, .prose ul {
+				font-variant-numeric: lining-nums tabular-nums;
+			}
+			.prose code {
+				font-variant-numeric: lining-nums tabular-nums;
 			}
 			@media (max-width: 720px) {
 				.prose {

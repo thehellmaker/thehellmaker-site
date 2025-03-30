@@ -37,6 +37,7 @@ body {
 	color: rgb(var(--gray-dark));
 	font-size: 20px;
 	line-height: 3em;
+	font-feature-settings: "tnum", "lnum"; /* Enable tabular and lining figures for numbers */
 }
 
 main {
@@ -52,7 +53,7 @@ h3,
 h4,
 h5,
 h6 {
-	margin: 2em 0 1em 0;
+	margin: 1.5em 0 0.5em 0;
 	color: rgb(var(--black));
 	line-height: 1.2;
 	font-weight: bold;
@@ -83,9 +84,11 @@ a:hover {
 	color: var(--accent);
 }
 p {
+	margin-top: 1em;
 	margin-bottom: 1em;
 }
 .prose p {
+	margin-top: 1em;
 	margin-bottom: 1em;
 	text-align: justify;
 }
@@ -199,6 +202,22 @@ hr {
 	white-space: nowrap;
 }
 
+/* Ensure proper number display in MDX content */
+.prose {
+	font-feature-settings: "tnum", "lnum"; /* Enable tabular and lining figures for numbers */
+}
+
+.prose p, .prose li, .prose ol, .prose ul {
+	font-variant-numeric: lining-nums tabular-nums; /* Modern way to enable lining figures */
+}
+
+/* Ensure numbers in lists display properly */
+ol {
+	list-style-type: decimal;
+	margin-left: 1.5em;
+	margin-bottom: 1.5em;
+	font-variant-numeric: lining-nums tabular-nums;
+}
 
 ul {
 	list-style-type: disc;

@@ -23,29 +23,99 @@ let unifiedPosts = [...posts, ...externalPosts];
 
 // Sort all posts by date, newest first
 unifiedPosts.sort((a, b) => b.pubDate.getTime() - a.pubDate.getTime());
+
+// Generate JSON-LD schema for the blog listing page
+const jsonLd = {
+	"@context": "https://schema.org",
+	"@type": "Blog",
+	"name": "ML Engineering & Distributed Systems Blog",
+	"description": "I write about ML engineering, distributed systems, and production infrastructure. As someone who loves distributed systems and scalability, I share insights on model deployment, ML ops, and everything in between.",
+	"url": Astro.url,
+	"blogPost": unifiedPosts.map(post => {
+		console.log(post);
+		return {
+			"@type": "BlogPosting",
+			"headline": post.title,
+			"url": new URL(post.url, Astro.url).toString(),
+			"datePublished": post.pubDate.toISOString(),
+			"author": post.authors.map(author => ({
+			"@type": "Person",
+			"name": author.name,
+			"url": author.url
+			}))
+		}
+	}),
+	"publisher": {
+		"@type": "Organization",
+		"name": "ML Engineering & Distributed Systems Blog",
+		"logo": {
+			"@type": "ImageObject",
+			"url": new URL("/ironman.jpg", Astro.url).toString()
+		}
+	},
+	"inLanguage": "en-US",
+	"keywords": "ML engineering, distributed systems, machine learning, technical blog, system design, database engineering, backend development, ML infrastructure, ML ops, model deployment, model serving, ML pipeline, model monitoring, feature engineering, data pipeline, model optimization, ML architecture, distributed training, model inference, ML platform, model versioning, ML workflow, model registry, ML observability, model performance, ML scalability, distributed computing, system architecture, AI infrastructure, ML system design, model deployment patterns, ML infrastructure, model lifecycle management, ML data management, model evaluation, ML testing, model validation, ML production, model serving optimization"
+};
 ---
 
 <Layout
 	title="ML Engineering & Distributed Systems Blog"
-	description="Expert insights on ML engineering, distributed systems, and production infrastructure. Covering model deployment, ML ops, and scalable system architecture."
+	description="I write about ML engineering, distributed systems, and production infrastructure. As someone who loves distributed systems and scalability, I share insights on model deployment, ML ops, and everything in between."
 >
-	<section class="shelf-content">
-		<div class="shelf-list">
-			{
-				// Render each post with its date and title as a link
-				unifiedPosts.map((post) => (
-					<article class="shelf-item">
-						<div class="shelf-title">
-							<span class="read-date">
-								<FormattedDate date={post.pubDate} />:
-							</span>
-							<a href={post.url} target={post.url.startsWith('http') ? '_blank' : undefined} rel={post.url.startsWith('http') ? 'noopener noreferrer' : undefined}>
-								{post.title}
-							</a>
-						</div>
-					</article>
-				))
-			}
-		</div>
-	</section>
+	<script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+	
+		<header class="blog-header">
+			<h1>ML Engineering & Distributed Systems Blog</h1>
+			<p class="blog-description">I write about ML engineering, distributed systems, and production infrastructure. As someone who loves distributed systems and scalability, I share insights on model deployment, ML ops, and everything in between.</p>
+		</header>
+
+		<nav aria-label="Blog posts navigation">
+			<section class="shelf-content" aria-label="Blog posts list">
+				<div class="shelf-list">
+					{
+						// Render each post with its date and title as a link
+						unifiedPosts.map((post) => (
+							<article class="shelf-item" itemscope itemtype="https://schema.org/BlogPosting">
+								<div class="shelf-title">
+									<time datetime={post.pubDate.toISOString()} itemprop="datePublished">
+										<span class="read-date">
+											<FormattedDate date={post.pubDate} />:
+										</span>
+									</time>
+									<a 
+										href={post.url} 
+										target={post.url.startsWith('http') ? '_blank' : undefined} 
+										rel={post.url.startsWith('http') ? 'noopener noreferrer' : undefined}
+										itemprop="url"
+									>
+										<span itemprop="headline">{post.title}</span>
+									</a>
+								</div>
+								<meta itemprop="author" content={post.authors.map(a => a.name).join(', ')} />
+							</article>
+						))
+					}
+				</div>
+			</section>
+		</nav>
 </Layout>
+
+<style>
+	.blog-header {
+		text-align: center;
+		margin-bottom: 2rem;
+	}
+
+	.blog-header h1 {
+		font-size: 2.5rem;
+		margin-bottom: 1rem;
+	}
+
+	.blog-description {
+		font-size: 1.2rem;
+		color: var(--text-color-light);
+		max-width: 800px;
+		margin: 0 auto;
+		line-height: 1.6;
+	}
+</style>

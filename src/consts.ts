@@ -36,3 +36,14 @@ users.set('thehellmaker', new User(
     'https://github.com/thehellmaker', 
     'https://thehellmaker.com'
 ));
+
+users.set('rajsiba', new User(
+    'rajsiba', 
+    'Siba Rajendran', 
+    'siba@rajsiba.com', 
+    '/siba.jpg', 
+    'I am a software engineer', 
+    'https://twitter.com/rajsiba', 
+    'https://github.com/rajsiba', 
+    'https://rajsiba.com'
+));

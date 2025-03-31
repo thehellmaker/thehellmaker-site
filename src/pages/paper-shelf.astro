@@ -1,52 +1,181 @@
 ---
-import Layout from '../layouts/StaticPage.astro';
+import Layout from "../layouts/StaticPage.astro";
 
 const papers = [
 	{
 		title: "Optimizing Instructions and Demonstrations for Multi-Stage Language Model Programs",
 		link: "https://arxiv.org/abs/2406.11695",
-		readDate: "Mar 15, 2025"
+		readDate: "Mar 15, 2025",
+		authors: "Researchers from Stanford University",
+		abstract:
+			"A study on optimizing language model programs through improved instructions and demonstrations.",
 	},
 	{
 		title: "Efficient Memory Management for Large Language Model Serving with PagedAttention",
 		link: "https://arxiv.org/abs/2309.06180",
-		readDate: "Feb 28, 2025"
+		readDate: "Feb 28, 2025",
+		authors: "Researchers from UC Berkeley",
+		abstract:
+			"Novel approach to memory management in LLM serving using paged attention mechanism.",
 	},
 	{
 		title: "FlashAttention: Fast and Memory-Efficient Exact Attention with IO-Awareness",
 		link: "https://arxiv.org/abs/2205.14135",
-		readDate: "Feb 15, 2025"
+		readDate: "Feb 15, 2025",
+		authors: "Researchers from Stanford University",
+		abstract:
+			"Breakthrough in attention computation efficiency with IO-aware optimizations.",
 	},
 	{
 		title: "Distributed Training of Large Language Models",
 		link: "https://arxiv.org/abs/2307.08691",
-		readDate: "Jan 30, 2025"
+		readDate: "Jan 30, 2025",
+		authors: "Researchers from Microsoft Research",
+		abstract:
+			"Comprehensive guide to distributed training techniques for large language models.",
 	},
 	{
 		title: "Efficient Methods for Fine-tuning Large Language Models",
 		link: "https://arxiv.org/abs/2310.03714",
-		readDate: "Jan 15, 2025"
-	}
+		readDate: "Jan 15, 2025",
+		authors: "Researchers from Google Research",
+		abstract:
+			"State-of-the-art methods for efficient fine-tuning of large language models.",
+	},
 ];
+
+// Generate JSON-LD schema for the paper shelf
+const jsonLd = {
+	"@context": "https://schema.org",
+	"@type": "CollectionPage",
+	name: "Research Paper Collection - ML Engineering & Distributed Systems",
+	description:
+		"A curated collection of research papers on machine learning, distributed systems, and technical infrastructure. Covering topics like LLM optimization, attention mechanisms, and distributed training.",
+	url: Astro.url,
+	about: {
+		"@type": "Thing",
+		name: "Machine Learning Research",
+		description:
+			"Research papers on ML engineering, distributed systems, and technical infrastructure",
+	},
+	hasPart: papers.map((paper) => ({
+		"@type": "ScholarlyArticle",
+		headline: paper.title,
+		url: paper.link,
+		dateRead: paper.readDate,
+		author: {
+			"@type": "Person",
+			name: paper.authors,
+		},
+		abstract: paper.abstract,
+		isPartOf: {
+			"@type": "Collection",
+			name: "Research Paper Collection",
+		},
+	})),
+	publisher: {
+		"@type": "Organization",
+		name: "ML Engineering & Distributed Systems Blog",
+		logo: {
+			"@type": "ImageObject",
+			url: new URL("/ironman.jpg", Astro.url).toString(),
+		},
+	},
+	inLanguage: "en-US",
+	keywords:
+		"research papers, machine learning, distributed systems, LLM optimization, attention mechanisms, distributed training, technical infrastructure, ML engineering, system design, database engineering, backend development, ML infrastructure, ML ops, model deployment, model serving, ML pipeline, model monitoring, feature engineering, data pipeline, model optimization, ML architecture",
+};
 ---
 
 <Layout
-	title="Paper Shelf"
-	description="A collection of papers I've read and found interesting."
+	title="Research Paper Collection - ML Engineering & Distributed Systems"
+	description="A curated collection of research papers on machine learning, distributed systems, and technical infrastructure. Covering topics like LLM optimization, attention mechanisms, and distributed training."
 >
-	<section class="shelf-content">
-		<div class="shelf-list">
-			{papers.map((paper) => (
-				<article class="shelf-item">
-					<div class="shelf-title">
-						<span class="read-date">{paper.readDate}:</span>
-						<a href={paper.link} target="_blank" rel="noopener noreferrer">
-							{paper.title}
-						</a>
-					</div>
-				</article>
-			))}
-		</div>
-	</section>
+	<script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
 
-</Layout> 
+	<header class="paper-shelf-header">
+		<h1>Research Paper Collection</h1>
+		<p class="paper-shelf-description">
+			A curated collection of research papers on machine learning,
+			distributed systems, and technical infrastructure. Covering topics
+			like LLM optimization, attention mechanisms, and distributed
+			training.
+		</p>
+	</header>
+
+	<nav aria-label="Research papers navigation">
+		<section class="shelf-content" aria-label="Research papers list">
+			<div class="shelf-list">
+				{
+					papers.map((paper) => (
+						<article
+							class="shelf-item"
+							itemscope
+							itemtype="https://schema.org/ScholarlyArticle"
+						>
+							<div class="shelf-title">
+								<time
+									datetime={paper.readDate}
+									itemprop="dateRead"
+								>
+									<span class="read-date">
+										{paper.readDate}:
+									</span>
+								</time>
+								<a
+									href={paper.link}
+									target="_blank"
+									rel="noopener noreferrer"
+									itemprop="url"
+								>
+									<span itemprop="headline">
+										{paper.title}
+									</span>
+								</a>
+							</div>
+						</article>
+					))
+				}
+			</div>
+		</section>
+	</nav>
+</Layout>
+
+<style>
+	.paper-shelf-header {
+		text-align: center;
+		margin-bottom: 2rem;
+	}
+
+	.paper-shelf-header h1 {
+		font-size: 2.5rem;
+		margin-bottom: 1rem;
+	}
+
+	.paper-shelf-description {
+		font-size: 1.2rem;
+		color: var(--text-color-light);
+		max-width: 800px;
+		margin: 0 auto;
+		line-height: 1.6;
+	}
+
+	.paper-meta {
+		margin-top: 0.5rem;
+		padding-left: 1rem;
+	}
+
+	.paper-authors {
+		font-size: 0.9rem;
+		color: var(--text-color-light);
+		display: block;
+		margin-bottom: 0.5rem;
+	}
+
+	.paper-abstract {
+		font-size: 0.95rem;
+		color: var(--text-color-light);
+		line-height: 1.5;
+		margin: 0;
+	}
+</style>

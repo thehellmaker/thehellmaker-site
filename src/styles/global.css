@@ -35,8 +35,8 @@ body {
 	word-wrap: break-word;
 	overflow-wrap: break-word;
 	color: rgb(var(--gray-dark));
-	font-size: 20px;
-	line-height: 3em;
+	font-size: 16px;
+	line-height: 1.6;
 	font-feature-settings: "tnum", "lnum"; /* Enable tabular and lining figures for numbers */
 }
 
@@ -55,7 +55,7 @@ h5,
 h6 {
 	margin: 1.5em 0 0.5em 0;
 	color: rgb(var(--black));
-	line-height: 1.2;
+	line-height: 1.4;
 	font-weight: bold;
 }
 h1 {
@@ -91,6 +91,7 @@ p {
 	margin-top: 1em;
 	margin-bottom: 1em;
 	text-align: justify;
+	line-height: 1.6;
 }
 textarea {
 	width: 100%;
@@ -223,4 +224,50 @@ ul {
 	list-style-type: disc;
 	margin-left: 1.5em;
 	margin-bottom: 1.5em;
+}
+
+
+
+
+.shelf-list {
+	width: 1280px;
+	margin: 0 auto;
+}
+
+.shelf-item {
+	padding: 0.5rem 0;
+	border-bottom: 1px solid var(--border-color);
+}
+
+.shelf-item:last-child {
+	border-bottom: none;
+}
+
+.shelf-title {
+	display: flex;
+	align-items: baseline;
+	font-size: 1rem;
+	line-height: 1.5;
+}
+
+.shelf-title a {
+	color: #0066cc;
+	text-decoration: none;
+	margin-left: 0.5rem;
+}
+
+.shelf-title a:hover {
+	text-decoration: underline;
+}
+
+.read-date {
+	color: var(--text-light);
+	font-size: 0.9rem;
+	white-space: nowrap;
+}
+
+@media (max-width: 768px) {
+	.shelf-list {
+		padding: 0.5rem;
+	}
 }

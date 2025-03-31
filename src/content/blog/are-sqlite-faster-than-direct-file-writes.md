@@ -4,7 +4,7 @@ description: "A standard benchmark by SQLite team shows SQLite INSERTS are 35% f
 pubDate: 'Jan 31 2025'
 tags: 'os, database'
 group: 'systems'
-heroImage: '/blog-placeholder-3.jpg'
+heroImage: '/sqlite-d2f.jpg'
 authors: ['thehellmaker']
 ---
 

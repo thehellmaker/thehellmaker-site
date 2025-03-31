@@ -22,3 +22,6 @@ pnpm-debug.log*
 
 # jetbrains setting folder
 .idea/
+install-state.gz
+.yarnrc.yml
+yarn.lock

@@ -4,7 +4,7 @@ description: "Databases often write to WAL, on single or multiple machines, and 
 pubDate: 'Feb 2 2025'
 tags: 'os, database'
 group: 'systems'
-heroImage: '/blog-placeholder-3.jpg'
+heroImage: '/wal-sqlite.jpg'
 authors: ['thehellmaker']
 ---
 

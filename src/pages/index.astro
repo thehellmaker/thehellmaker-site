@@ -1,132 +1,51 @@
 ---
-// Import necessary components and utilities
-import BaseHead from '../components/BaseHead.astro';
-import Header from '../components/Header.astro';
-import Footer from '../components/Footer.astro';
-import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
-import { getCollection } from 'astro:content';
+import Layout from '../layouts/StaticPage.astro';
 import FormattedDate from '../components/FormattedDate.astro';
 import { User, users } from '../consts';
-
-// Define a Post class to standardize blog post data structure
-class Post {
-	title: string;
-	url: string;
-	pubDate: Date;
-	authors: User[];
-
-	constructor(title: string, url: string, pubDate: Date, authors: User[]) {
-		this.title = title;
-		this.url = url;
-		this.pubDate = pubDate;
-		this.authors = authors;
-	}
-}
+import { getCollection } from 'astro:content';
+import { Post, externalPosts } from '../data/blog-posts';
 
 // Fetch internal blog posts from the content collection and transform them into Post objects
 let posts = (await getCollection('blog')).map((post) => {
 	const authors = post.data.authors
 		.map((author) => users.get(author))
 		.filter((author): author is User => author !== undefined);
-	return new Post(post.data.title, `/blog/${post.id}/`, post.data.pubDate, authors);
+	return new Post(
+		post.data.title,
+		`/blog/${post.id}/`,
+		post.data.pubDate,
+		authors
+	);
 });
-
-// Define external blog posts that aren't part of the content collection
-let externalPosts = [
-	new Post('Event Loops, Multi-threading and Multi-processing', 'https://medium.com/@thehellmaker/event-loops-multi-threading-and-multi-processing-b57e65cf364f', new Date('2025-02-09'), [
-		users.get('thehellmaker')!,
-		users.get('rajsiba')!,
-	]),
-	new Post('Setting Up DeepSeek-R1 671B for Distributed Multi-Node, Multi-GPU Inference with VLLM and Ray', 'https://github.com/thehellmaker/llm-experiments/blob/main/deepseek-r1/README.md', new Date('2025-02-16'), [
-		users.get('thehellmaker')!,
-	]),
-]
 
 // Combine internal and external posts
 let unifiedPosts = [...posts, ...externalPosts];
 
 // Sort all posts by date, newest first
-unifiedPosts.sort((a, b) => b.pubDate.valueOf() - a.pubDate.valueOf());
-
+unifiedPosts.sort((a, b) => b.pubDate.getTime() - a.pubDate.getTime());
 ---
 
-<!doctype html>
-<html lang="en">
-	<head>
-		<BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} />
-		<style>
-			main {
-				width: 1280px;
-				min-height: calc(100vh - 300px);
+<Layout
+	title="Paper Shelf"
+	description="A collection of papers I've read and found interesting."
+>
+	<section class="shelf-content">
+		<div class="shelf-list">
+			{
+				// Render each post with its date and title as a link
+				unifiedPosts.map((post) => (
+					<article class="shelf-item">
+						<div class="shelf-title">
+							<span class="read-date">
+								<FormattedDate date={post.pubDate} />:
+							</span>
+							<a href={post.url} target={post.url.startsWith('http') ? '_blank' : undefined} rel={post.url.startsWith('http') ? 'noopener noreferrer' : undefined}>
+								{post.title}
+							</a>
+						</div>
+					</article>
+				))
 			}
-			ul {
-				flex-wrap: wrap;
-				gap: 2rem;
-				list-style-type: none;
-				margin: 0;
-				padding: 0;
-			}
-			ul li {
-				width: 100%;
-			}
-			ul li * {
-				text-decoration: none;
-			}
-			ul li img {
-				margin-bottom: 0.5rem;
-				border-radius: 12px;
-			}
-			ul li a {
-				display: inline-block;
-			}
-			.title {
-				margin: 0;
-				color: rgb(var(--black));
-				line-height: 1;
-			}
-			.date {
-				margin: 0;
-				color: rgb(var(--gray));
-			}
-			ul li a:hover h4,
-			ul li a:hover .date {
-				color: rgb(var(--accent));
-			}
-			ul a:hover img {
-				box-shadow: var(--box-shadow);
-			}
-			@media (max-width: 720px) {
-				ul {
-					gap: 0.5em;
-				}
-				ul li {
-					width: 100%;
-				}
-				ul li:first-child {
-					margin-bottom: 0;
-				}
-				ul li:first-child .title {
-					font-size: 1.563em;
-				}
-			}
-		</style>
-	</head>
-	<body>
-		<Header />
-		<main>
-			<section>
-				<ul>
-					{
-						// Render each post with its date and title as a link
-						unifiedPosts.map((post) => (
-							<li>
-								<FormattedDate date={post.pubDate} />: <a href={post.url}>{post.title}</a>
-							</li>
-						))
-					}
-				</ul>
-			</section>
-		</main>
-		<Footer />
-	</body>
-</html>
+		</div>
+	</section>
+</Layout>

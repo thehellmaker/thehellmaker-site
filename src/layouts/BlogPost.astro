@@ -28,11 +28,15 @@ const jsonLd = {
 	})),
 	"publisher": {
 		"@type": "Organization",
-		"name": "Technical Blog",
+		"name": "ML Engineering & Distributed Systems Blog",
 		"logo": {
 			"@type": "ImageObject",
 			"url": new URL("/ironman.jpg", Astro.url).toString()
-		}
+		},
+		"sameAs": [
+			"https://github.com/thehellmaker",
+			"https://linkedin.com/in/akash-ashok"
+		]
 	},
 	"datePublished": pubDate.toISOString(),
 	"dateModified": updatedDate ? updatedDate.toISOString() : pubDate.toISOString(),
@@ -49,8 +53,8 @@ const jsonLd = {
 	"inLanguage": "en-US",
 	"about": {
 		"@type": "Thing",
-		"name": "Technical Blog",
-		"description": "Technical articles about ML engineering, distributed systems, and software architecture."
+		"name": "Machine Learning Engineering",
+		"description": "Technical articles about ML engineering, distributed systems, and production infrastructure"
 	},
 	"technicalSpecifications": {
 		"@type": "TechSpecification",
@@ -73,7 +77,33 @@ const jsonLd = {
 			"ML Architecture"
 		],
 		"technicalLevel": "Advanced",
-		"targetAudience": "Software Engineers, ML Engineers, System Architects"
+		"targetAudience": "Software Engineers, ML Engineers, System Architects",
+		"prerequisites": [
+			"Basic understanding of distributed systems",
+			"Familiarity with machine learning concepts",
+			"Experience with system design",
+			"Knowledge of database systems"
+		],
+		"learningObjectives": [
+			"Understanding ML system architecture",
+			"Grasping distributed system concepts",
+			"Learning about production ML infrastructure",
+			"Mastering system design patterns"
+		]
+	},
+	"interactionStatistic": {
+		"@type": "InteractionCounter",
+		"interactionType": "https://schema.org/ReadAction",
+		"userInteractionCount": 0
+	},
+	"comment": {
+		"@type": "Comment",
+		"text": "Comments are welcome on this technical article"
+	},
+	"offers": {
+		"@type": "Offer",
+		"price": "0",
+		"priceCurrency": "USD"
 	}
 };
 ---

@@ -13,11 +13,75 @@ const { title, description, pubDate, updatedDate, heroImage, authors } =
 const authorUsers = authors
 	.map((author) => users.get(author))
 	.filter((author): author is User => author !== undefined);
+
+// Generate JSON-LD schema
+const jsonLd = {
+	"@context": "https://schema.org",
+	"@type": "TechArticle",
+	"headline": title,
+	"description": description,
+	"image": heroImage ? new URL(heroImage, Astro.url).toString() : undefined,
+	"author": authorUsers.map(author => ({
+		"@type": "Person",
+		"name": author.name,
+		"url": author.url
+	})),
+	"publisher": {
+		"@type": "Organization",
+		"name": "Technical Blog",
+		"logo": {
+			"@type": "ImageObject",
+			"url": new URL("/ironman.jpg", Astro.url).toString()
+		}
+	},
+	"datePublished": pubDate.toISOString(),
+	"dateModified": updatedDate ? updatedDate.toISOString() : pubDate.toISOString(),
+	"mainEntityOfPage": {
+		"@type": "WebPage",
+		"@id": Astro.url.toString()
+	},
+	"keywords": "ML engineering, distributed systems, machine learning, technical blog, system design, database engineering, backend development, ML infrastructure, ML ops, model deployment, model serving, ML pipeline, model monitoring, feature engineering, data pipeline, model optimization, ML architecture, distributed training, model inference, ML platform, model versioning, ML workflow, model registry, ML observability, model performance, ML scalability, distributed computing, system architecture, AI infrastructure, ML system design, model deployment patterns, ML infrastructure, model lifecycle management, ML data management, model evaluation, ML testing, model validation, ML production, model serving optimization",
+	"articleSection": "Technical Blog",
+	"articleBody": description,
+	"wordCount": description.split(/\s+/).length,
+	"isAccessibleForFree": true,
+	"license": "https://creativecommons.org/licenses/by/4.0/",
+	"inLanguage": "en-US",
+	"about": {
+		"@type": "Thing",
+		"name": "Technical Blog",
+		"description": "Technical articles about ML engineering, distributed systems, and software architecture."
+	},
+	"technicalSpecifications": {
+		"@type": "TechSpecification",
+		"category": "Technical Blog",
+		"topics": [
+			"ML Engineering",
+			"Distributed Systems",
+			"System Design",
+			"Database Engineering",
+			"Backend Development",
+			"ML Infrastructure",
+			"ML Ops",
+			"Model Deployment",
+			"Model Serving",
+			"ML Pipeline",
+			"Model Monitoring",
+			"Feature Engineering",
+			"Data Pipeline",
+			"Model Optimization",
+			"ML Architecture"
+		],
+		"technicalLevel": "Advanced",
+		"targetAudience": "Software Engineers, ML Engineers, System Architects"
+	}
+};
 ---
 
 <html lang="en">
 	<head>
 		<BaseHead title={title} description={description} />
+		<script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
 		<style>
 			main {
 				width: calc(100%);
@@ -126,7 +190,7 @@ const authorUsers = authors
 	<body>
 		<Header />
 		<main>
-			<article>
+			<article itemscope itemtype="https://schema.org/TechArticle">
 				<div class="prose">
 					<div class="title">
 						<h1>{title}</h1>

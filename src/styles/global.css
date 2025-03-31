@@ -142,6 +142,8 @@ img {
 	max-width: 100%;
 	height: auto;
 	border-radius: 8px;
+	object-fit: contain;
+	display: block;
 }
 code {
 	padding: 2px 5px;
@@ -225,9 +227,6 @@ ul {
 	margin-left: 1.5em;
 	margin-bottom: 1.5em;
 }
-
-
-
 
 .shelf-list {
 	width: 1280px;

@@ -11,9 +11,10 @@ authors: ['thehellmaker']
 ## Introduction
 Databases rely on Write-Ahead Logging (WAL) to ensure durability and performance. When a database processes a write request, it often appends the change to a sequential log called WAL before applying it to the actual database storage. This approach enables databases to acknowledge writes faster, ensuring both durability and performance. 
 
-| ![image info](/WALBeforeDBUpdate.excalidraw.png) |
-|:--:|
-| **[Figure 1](/WALBeforeDBUpdate.excalidraw):** First update WAL and then update DB |
+<div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', flexDirection: 'column', margin: '2rem auto', maxWidth: '800px' }}>
+  <img src="/WALBeforeDBUpdate.excalidraw.png" alt="First update WAL and then update DB" style={{ width: '100%', height: 'auto' }} />
+  <p style={{ textAlign: 'center', marginTop: '1rem' }}><strong>Figure 1:</strong> First update WAL and then update DB</p>
+</div>
 
 ## How is it faster than direct writes to db files?
 Writes to a WAL is Faster than writes to DB for the following reasons
@@ -42,9 +43,10 @@ Consider an application performing the following update operations:
 
 3. **UPDATE (3, Sindhu, Address3.1)** – Updating the address of the record with ID 3.
 
-| ![image info](/DBSequentialvsRandomIO.excalidraw.png) |
-|:--:|
-| **[Figure 2](/DBSequentialvsRandomIO.excalidraw):** First update WAL and then update DB |
+<div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', flexDirection: 'column', margin: '2rem auto', maxWidth: '800px' }}>
+  <img src="/DBSequentialvsRandomIO.excalidraw.png" alt="First update WAL and then update DB" style={{ width: '100%', height: 'auto' }} />
+  <p style={{ textAlign: 'center', marginTop: '1rem' }}><strong>Figure 2:</strong> First update WAL and then update DB</p>
+</div>
 
 ##### How these updates are handled in WAL
 When these updates are executed, they are first appended sequentially to the WAL file:

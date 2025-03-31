@@ -28,24 +28,32 @@ const { title, description, image = '/blog-placeholder-1.jpg' } = Astro.props;
 />
 <meta name="generator" content={Astro.generator} />
 
+<!-- SEO Meta Tags -->
+<meta name="keywords" content="ML engineering, distributed systems, machine learning infrastructure, ML systems design, model deployment, ML ops, model serving, ML pipeline, model monitoring, feature engineering, data pipeline, model optimization, ML architecture, distributed training, model inference, ML platform, model versioning, ML workflow, model registry, ML observability, model performance, ML scalability, distributed computing, system design, database engineering, backend development, technical blog, database optimization, system architecture, AI infrastructure, ML inference, model training, distributed ML, ML system design, model deployment patterns, ML infrastructure, model lifecycle management, ML data management, model evaluation, ML testing, model validation, ML production, model serving optimization" />
+<meta name="author" content="Akash Ashok" />
+<meta name="robots" content="index, follow" />
+<meta name="language" content="English" />
+<meta name="revisit-after" content="7 days" />
+
 <!-- Canonical URL -->
 <link rel="canonical" href={canonicalURL} />
 
 <!-- Primary Meta Tags -->
-<title>{title}</title>
-<meta name="title" content={title} />
-<meta name="description" content={description} />
+<title>{title} | ML Engineering & Distributed Systems Blog</title>
+<meta name="title" content={`${title} | ML Engineering & Distributed Systems Blog`} />
+<meta name="description" content={`${description} | Expert insights on ML engineering, distributed systems, and production infrastructure. Covering model deployment, ML ops, and scalable system architecture.`} />
 
 <!-- Open Graph / Facebook -->
 <meta property="og:type" content="website" />
 <meta property="og:url" content={Astro.url} />
-<meta property="og:title" content={title} />
-<meta property="og:description" content={description} />
+<meta property="og:title" content={`${title} | ML Engineering & Distributed Systems Blog`} />
+<meta property="og:description" content={`${description} | Expert insights on ML engineering, distributed systems, and production infrastructure. Covering model deployment, ML ops, and scalable system architecture.`} />
 <meta property="og:image" content={new URL(image, Astro.url)} />
+<meta property="og:site_name" content="ML Engineering & Distributed Systems Blog" />
 
-<!-- Twitter -->
-<meta property="twitter:card" content="summary_large_image" />
-<meta property="twitter:url" content={Astro.url} />
-<meta property="twitter:title" content={title} />
-<meta property="twitter:description" content={description} />
-<meta property="twitter:image" content={new URL(image, Astro.url)} />
+<!-- Twitter/X Card -->
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:creator" content="@thehellmaker" />
+<meta name="twitter:title" content={`${title} | ML Engineering & Distributed Systems Blog`} />
+<meta name="twitter:description" content={`${description} | Expert insights on ML engineering, distributed systems, and production infrastructure. Covering model deployment, ML ops, and scalable system architecture.`} />
+<meta name="twitter:image" content={new URL(image, Astro.url)} />

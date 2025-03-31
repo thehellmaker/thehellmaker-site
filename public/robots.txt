@@ -1,0 +1,50 @@
+User-agent: *
+Allow: /
+Allow: /blog/
+Allow: /paper-shelf/
+Allow: /images/
+Allow: /fonts/
+
+Disallow: /admin/
+Disallow: /private/
+Disallow: /api/
+Disallow: /draft/
+Disallow: /temp/
+
+# Crawl-delay for specific bots
+User-agent: GPTBot
+Crawl-delay: 1
+
+User-agent: ChatGPT-User
+Crawl-delay: 1
+
+User-agent: Googlebot
+Crawl-delay: 0.5
+
+User-agent: Bingbot
+Crawl-delay: 0.5
+
+User-agent: DuckDuckBot
+Crawl-delay: 0.5
+
+# ML-specific crawlers
+User-agent: MLBot
+Crawl-delay: 1
+
+User-agent: TensorFlowBot
+Crawl-delay: 1
+
+User-agent: PyTorchBot
+Crawl-delay: 1
+
+# Distributed systems crawlers
+User-agent: KubernetesBot
+Crawl-delay: 1
+
+User-agent: DockerBot
+Crawl-delay: 1
+
+User-agent: CloudNativeBot
+Crawl-delay: 1
+
+Sitemap: /sitemap.xml 

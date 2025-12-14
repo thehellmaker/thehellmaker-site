@@ -10,7 +10,7 @@ authors: ['thehellmaker']
 
 ## What is this about?
 
-I wanted to understand what actually happens when you call `.backward()` in PyTorch. Not the high-level "it computes gradients" explanation, but the actual mechanics. Turns out, Andrej Karpathy built exactly what I needed: **micrograd** — a ~150 line autograd engine that implements backpropagation from scratch.
+I wanted to understand what actually happens when you call `.backward()` in PyTorch. Not the high-level "it computes gradients" explanation, but the actual mechanics. Turns out, Andrej Karpathy built exactly what I needed: **micrograd**, a ~150 line autograd engine that implements backpropagation from scratch.
 
 This post is my study notes. I'm writing it as a reference for myself, but maybe it helps you too.
 
@@ -58,15 +58,15 @@ $$
 \frac{\partial L}{\partial w_1} = \frac{\partial L}{\partial a_n} \cdot \frac{\partial a_n}{\partial a_{n-1}} \cdot ... \cdot \frac{\partial a_2}{\partial a_1} \cdot \frac{\partial a_1}{\partial w_1}
 $$
 
-We compute this from the end backwards — hence "backpropagation."
+We compute this from the end backwards, hence "backpropagation."
 
 ### Why "automatic" differentiation?
 
 Three ways to compute derivatives:
 
-1. **Symbolic** — Manipulate formulas (Wolfram Alpha style). Gets messy fast with complex expressions.
-2. **Numerical** — Finite differences: $f'(x) \approx \frac{f(x+h) - f(x)}{h}$. Slow and numerically unstable.
-3. **Automatic** — Track operations, apply chain rule. This is what micrograd does.
+1. **Symbolic**: Manipulate formulas (Wolfram Alpha style). Gets messy fast with complex expressions.
+2. **Numerical**: Finite differences, $f'(x) \approx \frac{f(x+h) - f(x)}{h}$. Slow and numerically unstable.
+3. **Automatic**: Track operations, apply chain rule. This is what micrograd does.
 
 The key thing: autodiff doesn't give you a formula for the derivative. It gives you the derivative's **value** at a specific point. Big difference.
 
@@ -112,7 +112,7 @@ a = Value(3.0)
 b = a + a  # a appears twice
 ```
 
-Both paths contribute to `a`'s gradient. If `b = a + a`, then $\frac{\partial b}{\partial a} = 2$. We need to sum contributions from all paths — that's the multivariate chain rule.
+Both paths contribute to `a`'s gradient. If `b = a + a`, then $\frac{\partial b}{\partial a} = 2$. We need to sum contributions from all paths. That's the multivariate chain rule.
 
 ---
 
@@ -164,7 +164,7 @@ $$
 \frac{\partial L}{\partial x} = \frac{\partial L}{\partial z} \cdot y
 $$
 
-Each input's gradient gets scaled by the *other* input's value. Makes sense if you think about it — if $y$ is large, then small changes in $x$ have big effects on the output.
+Each input's gradient gets scaled by the *other* input's value. Makes sense if you think about it: if $y$ is large, then small changes in $x$ have big effects on the output.
 
 ### Power
 
@@ -186,7 +186,7 @@ $$
 \frac{\partial z}{\partial x} = n \cdot x^{n-1}
 $$
 
-Classic power rule from calc. This handles division too — $\frac{a}{b} = a \cdot b^{-1}$, and the power rule gives us the derivative of $b^{-1}$.
+Classic power rule from calc. This handles division too: $\frac{a}{b} = a \cdot b^{-1}$, and the power rule gives us the derivative of $b^{-1}$.
 
 ### ReLU
 
@@ -205,7 +205,7 @@ $$
 \text{ReLU}(x) = \max(0, x)
 $$
 
-Gradient is 1 if positive, 0 if negative. It's a gate — either lets the gradient through or blocks it.
+Gradient is 1 if positive, 0 if negative. It's a gate: either lets the gradient through or blocks it.
 
 Why ReLU instead of sigmoid or tanh? Those older activations have gradients that approach 0 for large inputs (vanishing gradient problem). ReLU's gradient is always 0 or 1, which helps deep networks train. AlexNet (2012) popularized this.
 
@@ -238,7 +238,7 @@ def backward(self):
 
 ### Why topological sort?
 
-To compute $\frac{\partial L}{\partial x}$, you need $\frac{\partial L}{\partial z}$ first (where $z$ depends on $x$). So you have to process nodes in the right order — outputs before inputs.
+To compute $\frac{\partial L}{\partial x}$, you need $\frac{\partial L}{\partial z}$ first (where $z$ depends on $x$). So you have to process nodes in the right order, outputs before inputs.
 
 Example: $L = (a + b) \cdot c$
 
@@ -266,7 +266,7 @@ def __radd__(self, other): return self + other
 def __rmul__(self, other): return self * other
 ```
 
-`__radd__` and `__rmul__` handle cases like `2 + Value(3)` — Python tries `int.__add__` first, which fails, then falls back to `Value.__radd__`.
+`__radd__` and `__rmul__` handle cases like `2 + Value(3)`. Python tries `int.__add__` first, which fails, then falls back to `Value.__radd__`.
 
 ---
 
@@ -324,7 +324,7 @@ class MLP(Module):
 `MLP(2, [16, 16, 1])` creates:
 - Layer 1: 2 → 16 (with ReLU)
 - Layer 2: 16 → 16 (with ReLU)
-- Layer 3: 16 → 1 (no ReLU — we want raw scores)
+- Layer 3: 16 → 1 (no ReLU, we want raw scores)
 
 The last layer being linear is important. For classification, we want unbounded scores that the loss function interprets.
 
@@ -410,7 +410,7 @@ Same computation, same gradients. A 100-line implementation matches a production
 
 ## What's missing for production
 
-Micrograd operates on scalars. Real frameworks use tensors and run on GPUs. It also only has ~5 operations; PyTorch has hundreds. And the optimizer here is manual SGD — production code uses Adam, which adapts learning rates automatically.
+Micrograd operates on scalars. Real frameworks use tensors and run on GPUs. It also only has ~5 operations; PyTorch has hundreds. And the optimizer here is manual SGD. Production code uses Adam, which adapts learning rates automatically.
 
 But the core algorithm is identical. The rest is engineering and optimization.
 
@@ -420,13 +420,13 @@ But the core algorithm is identical. The rest is engineering and optimization.
 
 If you want to go deeper:
 
-**Karpathy's video**: [The spelled-out intro to neural networks and backpropagation](https://www.youtube.com/watch?v=VMj-3S1tku0) — walks through building micrograd step by step.
+**Karpathy's video**: [The spelled-out intro to neural networks and backpropagation](https://www.youtube.com/watch?v=VMj-3S1tku0). Walks through building micrograd step by step.
 
-**3Blue1Brown**: [What is backpropagation really doing?](https://www.youtube.com/watch?v=Ilg3gGewQ5U) and [Backpropagation calculus](https://www.youtube.com/watch?v=tIeHLnjs5U8) — great visual explanations.
+**3Blue1Brown**: [What is backpropagation really doing?](https://www.youtube.com/watch?v=Ilg3gGewQ5U) and [Backpropagation calculus](https://www.youtube.com/watch?v=tIeHLnjs5U8). Great visual explanations.
 
-**The original paper**: [Rumelhart, Hinton, Williams (1986)](https://www.nature.com/articles/323533a0) — worth skimming for historical context.
+**The original paper**: [Rumelhart, Hinton, Williams (1986)](https://www.nature.com/articles/323533a0). Worth skimming for historical context.
 
-**Autodiff survey**: [Baydin et al.](https://arxiv.org/abs/1502.05767) — if you want the full academic treatment.
+**Autodiff survey**: [Baydin et al.](https://arxiv.org/abs/1502.05767) if you want the full academic treatment.
 
 ---
 
@@ -434,7 +434,7 @@ If you want to go deeper:
 
 The core of deep learning fits in 150 lines. Forward pass, build a graph, backward pass with chain rule, update weights. That's it.
 
-Everything else — tensors, GPUs, batch norm, transformers — is built on top of this. The scale changes, the fundamentals don't.
+Everything else (tensors, GPUs, batch norm, transformers) is built on top of this. The scale changes, the fundamentals don't.
 
 ---
 

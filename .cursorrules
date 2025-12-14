@@ -1,0 +1,41 @@
+# Cursor Rules for thehellmaker-site
+
+## Project Context
+Personal tech blog built with Astro, React, and Tailwind. Focus on systems programming, databases, and ML topics.
+
+## Code Style
+
+### TypeScript/React
+- Functional components only
+- Use TypeScript interfaces for props
+- Prefer `const` over `let`
+- Destructure props in function signature
+- Use Tailwind classes, avoid inline styles
+- Keep components focused and small
+
+### Blog Posts
+- Write in markdown or MDX
+- Use direct, technical language
+- No em dashes (use colons, periods, commas instead)
+- Avoid LLM-sounding phrases like "fascinating", "elegant", "Key insight:"
+- Include working code examples
+- Math with KaTeX: `$inline$` and `$$block$$`
+
+### Astro
+- Use `.astro` for static layouts
+- Use React (`.tsx`) for interactive components
+- Add `client:load` directive for React components in MDX
+
+## Don'ts
+- Don't add unnecessary abstractions
+- Don't over-engineer simple things
+- Don't create files unless asked
+- Don't use emojis in code or technical writing
+- Don't write overly formal or "textbook" style content
+
+## File Locations
+- Blog posts: `src/content/blog/`
+- React components: `src/components/`
+- Images: `public/`
+- Layouts: `src/layouts/`
+

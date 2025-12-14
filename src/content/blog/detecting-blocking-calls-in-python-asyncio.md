@@ -216,20 +216,8 @@ async def hash_password(password: str) -> str:
     return await loop.run_in_executor(None, _sync_hash, password)
 ```
 
-## Installation
-
-```bash
-pip install asyncio-event-loop-monitor
-```
-
-Or with uv:
-
-```bash
-uv add asyncio-event-loop-monitor
-```
-
 ## Wrapping Up
 
-The `asyncio-event-loop-monitor` library uses `sys.setprofile` to hook into every function call, track timing only inside event loops, skip coroutines, and emit callbacks when sync calls exceed a threshold.
+The approach uses `sys.setprofile` to hook into every function call, track timing only inside event loops, skip coroutines, and emit callbacks when sync calls exceed a threshold.
 
-The code is on [GitHub](https://github.com/thehellmaker/asyncio-event-loop-monitor). It's saved me hours of debugging - hopefully it helps you too.
+I've packaged this into a library called [asyncio-event-loop-monitor](https://github.com/thehellmaker/asyncio-event-loop-monitor). It's saved me hours of debugging - hopefully it helps you too.

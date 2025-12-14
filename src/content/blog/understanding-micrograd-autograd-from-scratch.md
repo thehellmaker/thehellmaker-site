@@ -1,5 +1,5 @@
 ---
-title: 'Understanding Micrograd: Building an Autograd Engine from Scratch'
+title: "My Notes on Karpathy's Micrograd: Building an Autograd Engine from Scratch"
 description: "A deep dive into Andrej Karpathy's micrograd - understanding automatic differentiation, backpropagation, and neural networks from first principles with ~150 lines of Python."
 pubDate: 'Dec 14 2024'
 tags: 'machine-learning, deep-learning, autograd, neural-networks'

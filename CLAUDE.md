@@ -1,41 +1,32 @@
 # CLAUDE.md
 
-This is thehellmaker's personal tech blog built with Astro.
+Tech blog built with Astro.
 
-## Tech Stack
+## Stack
 
-- **Framework**: Astro 5.x with static site generation
-- **Styling**: Tailwind CSS 3.x
-- **Components**: React 18 for interactive components
-- **Math**: KaTeX via remark-math and rehype-katex
-- **Animation**: Framer Motion, anime.js
-- **Deployment**: Cloudflare Pages (adapter available but currently static)
+- Astro 5.x (static)
+- Tailwind CSS
+- React 18 for interactive stuff
+- KaTeX for math
+- Framer Motion / anime.js for animation
 
-## Project Structure
+## Structure
 
 ```
-src/
-├── content/blog/       # Blog posts in .md or .mdx
-├── components/         # Astro and React components
-│   ├── blog/          # Post-specific interactive components
-│   └── *.astro        # Layout components
-├── layouts/           # Page layouts
-├── pages/             # Route pages
-└── styles/            # Global CSS
-public/                # Static assets (images, fonts)
+src/content/blog/    # posts (.md or .mdx)
+src/components/      # React and Astro components
+src/layouts/         # page layouts
+public/              # images, fonts
 ```
 
-## Blog Post Format
+## Blog Post Frontmatter
 
-Posts go in `src/content/blog/` as `.md` or `.mdx` files.
-
-Frontmatter schema:
 ```yaml
 ---
 title: 'Post Title'
-description: 'Description for SEO'
+description: 'SEO description'
 pubDate: 'Dec 14 2024'
-heroImage: '/image-name.jpg'  # optional, from public/
+heroImage: '/image.jpg'  # optional
 authors: ['thehellmaker']
 ---
 ```
@@ -43,34 +34,22 @@ authors: ['thehellmaker']
 ## Commands
 
 ```bash
-npm run dev      # Start dev server at localhost:4321
-npm run build    # Build for production
-npm run preview  # Preview production build
+npm run dev      # localhost:4321
+npm run build    # production build
+npm run preview  # preview build
 ```
 
-## Writing Style
+## Math
 
-- Technical deep-dives with code and math
-- Use KaTeX for math: inline `$...$`, block `$$...$$`
-- Keep explanations direct, avoid fluff
-- Include code snippets with proper syntax highlighting
-- For interactive visualizations, create React components in `src/components/blog/`
+Inline: `$x^2$`
+Block: `$$\sum_{i=1}^n x_i$$`
 
-## Common Patterns
+## Interactive Components
 
-### Adding images
-Put images in `public/`, reference as `/filename.jpg`
+Put React components in `src/components/blog/`, use in MDX:
 
-### Interactive components in MDX
 ```mdx
-import MyComponent from '../../components/blog/MyComponent.tsx';
+import MyViz from '../../components/blog/MyViz.tsx';
 
-<MyComponent client:load />
+<MyViz client:load />
 ```
-
-### React components
-- Use TypeScript
-- Functional components with hooks
-- Tailwind for styling
-- Export as default
-

@@ -8,25 +8,21 @@ heroImage: '/blog-placeholder-3.jpg'
 authors: ['thehellmaker']
 ---
 
-## What is this about?
+## What is this?
 
-I wanted to understand what actually happens when you call `.backward()` in PyTorch. Not the high-level "it computes gradients" explanation, but the actual mechanics. Turns out, Andrej Karpathy built exactly what I needed: **micrograd**, a ~150 line autograd engine that implements backpropagation from scratch.
+This post breaks down the math and code behind [Andrej Karpathy's micrograd](https://github.com/karpathy/micrograd), a ~150 line autograd engine that implements backpropagation from scratch.
 
-This post is my study notes. I'm writing it as a reference for myself, but maybe it helps you too.
+Karpathy also has a [2.5 hour YouTube video](https://www.youtube.com/watch?v=VMj-3S1tku0) building micrograd from zero. If you prefer video, watch that. This post covers the same material in written form with the math spelled out.
 
-The [micrograd repo](https://github.com/karpathy/micrograd) has two files that matter:
+The repo has two files:
 - `engine.py` (~95 lines): The autograd engine
 - `nn.py` (~60 lines): Neural network building blocks
 
-That's it. Two files, and you can train a neural network.
+That's enough to train a small neural network.
 
----
+### Quick history
 
-## Some background
-
-Backpropagation has been around since the 1970s (Seppo Linnainmaa's thesis), but it really took off in 1986 when Rumelhart, Hinton, and Williams published ["Learning representations by back-propagating errors"](https://www.nature.com/articles/323533a0). That paper showed you could train multi-layer networks with it.
-
-Karpathy made micrograd because he believes you don't really understand something until you build it. He has a great [YouTube video](https://www.youtube.com/watch?v=VMj-3S1tku0) walking through the whole thing if you prefer video.
+Backpropagation has been around since the 1970s (Seppo Linnainmaa's thesis), but took off in 1986 when Rumelhart, Hinton, and Williams published ["Learning representations by back-propagating errors"](https://www.nature.com/articles/323533a0). That paper showed you could train multi-layer networks with it.
 
 ---
 

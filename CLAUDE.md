@@ -76,4 +76,10 @@ Technical blog posts. Keep it clean and direct.
 - Use short sentences
 - Vary sentence and paragraph structure
 - Be direct about what things are and how they work
-- If referencing someone's work, credit them and link it
+
+### Attribution
+- Credit original authors prominently. If explaining someone's work, say so upfront
+- Don't claim knowledge as your own. This is a learning blog, not original research
+- Link to original repos, papers, videos, blog posts
+- If the post is based on someone's tutorial/course, title should reflect that (e.g., "My Notes on X's Y")
+- Include a references section at the end with all sources

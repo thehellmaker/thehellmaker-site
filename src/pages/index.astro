@@ -69,54 +69,97 @@ const jsonLd = {
 			<p class="blog-description">I write about ML engineering, distributed systems, and production infrastructure. These posts are my learning notes, written with LLM assistance. I'm a fan of LLMs and won't pretend otherwise. I direct the content, review everything, and work to keep the slop out. I try to go as deep as possible so the value you get (or I get when I revisit) is worth more than the feeling that it's just LLM-generated filler.</p>
 		</header>
 
+		<hr class="divider" />
+
 		<nav aria-label="Blog posts navigation">
-			<section class="shelf-content" aria-label="Blog posts list">
-				<div class="shelf-list">
-					{
-						// Render each post with its date and title as a link
-						unifiedPosts.map((post) => (
-							<article class="shelf-item" itemscope itemtype="https://schema.org/BlogPosting">
-								<div class="shelf-title">
-									<time datetime={post.pubDate.toISOString()} itemprop="datePublished">
-										<span class="read-date">
-											<FormattedDate date={post.pubDate} />:
-										</span>
-									</time>
-									<a 
-										href={post.url} 
-										target={post.url.startsWith('http') ? '_blank' : undefined} 
-										rel={post.url.startsWith('http') ? 'noopener noreferrer' : undefined}
-										itemprop="url"
-									>
-										<span itemprop="headline">{post.title}</span>
-									</a>
-								</div>
-								<meta itemprop="author" content={post.authors.map(a => a.name).join(', ')} />
-							</article>
-						))
-					}
-				</div>
+			<section class="posts-list" aria-label="Blog posts list">
+				{
+					unifiedPosts.map((post) => (
+						<article class="post-item" itemscope itemtype="https://schema.org/BlogPosting">
+							<a 
+								href={post.url} 
+								target={post.url.startsWith('http') ? '_blank' : undefined} 
+								rel={post.url.startsWith('http') ? 'noopener noreferrer' : undefined}
+								itemprop="url"
+								class="post-link"
+							>
+								<span itemprop="headline" class="post-title">{post.title}</span>
+							</a>
+							<time datetime={post.pubDate.toISOString()} itemprop="datePublished" class="post-date">
+								<FormattedDate date={post.pubDate} />
+							</time>
+							<meta itemprop="author" content={post.authors.map(a => a.name).join(', ')} />
+						</article>
+					))
+				}
 			</section>
 		</nav>
 </Layout>
 
 <style>
 	.blog-header {
-		text-align: center;
-		margin-bottom: 2rem;
+		margin-bottom: 1.5rem;
 	}
 
 	.blog-header h1 {
-		font-size: 2.5rem;
+		font-size: 1.8rem;
 		margin-bottom: 1rem;
+		font-weight: 700;
 	}
 
 	.blog-description {
-		font-size: 1.2rem;
-		color: var(--text-color-light);
-		max-width: 800px;
-		margin: 0 auto;
-		line-height: 1.6;
+		font-size: 1rem;
+		color: rgb(var(--gray));
+		line-height: 1.7;
 		text-align: justify;
+	}
+
+	.divider {
+		border: none;
+		border-top: 1px solid rgb(var(--gray-light));
+		margin: 2rem 0;
+	}
+
+	.posts-list {
+		display: flex;
+		flex-direction: column;
+		gap: 1.5rem;
+	}
+
+	.post-item {
+		display: flex;
+		flex-direction: column;
+		gap: 0.25rem;
+	}
+
+	.post-link {
+		text-decoration: none;
+	}
+
+	.post-title {
+		font-size: 1.1rem;
+		font-weight: 500;
+		color: rgb(var(--black));
+		transition: color 0.15s ease;
+	}
+
+	.post-link:hover .post-title {
+		color: var(--accent);
+	}
+
+	.post-date {
+		font-size: 0.875rem;
+		color: rgb(var(--gray));
+		font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, monospace;
+	}
+
+	@media (max-width: 720px) {
+		.blog-header h1 {
+			font-size: 1.5rem;
+		}
+
+		.post-title {
+			font-size: 1rem;
+		}
 	}
 </style>

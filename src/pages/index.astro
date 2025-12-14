@@ -5,24 +5,37 @@ import { User, users } from '../consts';
 import { getCollection } from 'astro:content';
 import { Post, externalPosts } from '../data/blog-posts';
 
-// Fetch internal blog posts from the content collection and transform them into Post objects
-let posts = (await getCollection('blog')).map((post) => {
-	const authors = post.data.authors
-		.map((author) => users.get(author))
-		.filter((author): author is User => author !== undefined);
-	return new Post(
-		post.data.title,
-		`/blog/${post.id}/`,
-		post.data.pubDate,
-		authors
-	);
-});
+// Fetch all blog posts
+const allBlogPosts = await getCollection('blog');
+
+// Transform and filter posts (show drafts in dev only)
+let posts = allBlogPosts
+	.filter((post) => import.meta.env.DEV || !post.data.draft)
+	.map((post) => {
+		const authors = post.data.authors
+			.map((author) => users.get(author))
+			.filter((author): author is User => author !== undefined);
+		const tags = post.data.tags ? post.data.tags.split(',').map((t: string) => t.trim()) : [];
+		return new Post(
+			post.data.title,
+			`/blog/${post.id}/`,
+			post.data.pubDate,
+			authors,
+			post.data.heroImage,
+			post.data.draft || false,
+			tags
+		);
+	});
 
 // Combine internal and external posts
-let unifiedPosts = [...posts, ...externalPosts];
+let allPosts = [...posts, ...externalPosts];
 
 // Sort all posts by date, newest first
-unifiedPosts.sort((a, b) => b.pubDate.getTime() - a.pubDate.getTime());
+allPosts.sort((a, b) => b.pubDate.getTime() - a.pubDate.getTime());
+
+// Show only top 7 on home page
+const displayPosts = allPosts.slice(0, 7);
+const hasMorePosts = allPosts.length > 7;
 
 // Generate JSON-LD schema for the blog listing page
 const jsonLd = {
@@ -31,8 +44,7 @@ const jsonLd = {
 	"name": "ML Engineering & Distributed Systems Blog",
 	"description": "I write about ML engineering, distributed systems, and production infrastructure. As someone who loves distributed systems and scalability, I share insights on model deployment, ML ops, and everything in between.",
 	"url": Astro.url,
-	"blogPost": unifiedPosts.map(post => {
-		console.log(post);
+	"blogPost": allPosts.map(post => {
 		return {
 			"@type": "BlogPosting",
 			"headline": post.title,
@@ -74,25 +86,31 @@ const jsonLd = {
 		<nav aria-label="Blog posts navigation">
 			<section class="posts-list" aria-label="Blog posts list">
 				{
-					unifiedPosts.map((post) => (
+					displayPosts.map((post) => (
 						<article class="post-item" itemscope itemtype="https://schema.org/BlogPosting">
-							<time datetime={post.pubDate.toISOString()} itemprop="datePublished" class="post-date">
-								<FormattedDate date={post.pubDate} />
-							</time>
-							<a 
-								href={post.url} 
-								target={post.url.startsWith('http') ? '_blank' : undefined} 
-								rel={post.url.startsWith('http') ? 'noopener noreferrer' : undefined}
-								itemprop="url"
-								class="post-link"
-							>
-								<span itemprop="headline" class="post-title">{post.title}</span>
-							</a>
-							<meta itemprop="author" content={post.authors.map(a => a.name).join(', ')} />
+							<div class="post-row">
+								<time datetime={post.pubDate.toISOString()} itemprop="datePublished" class="post-date">
+									<FormattedDate date={post.pubDate} />:
+								</time>
+								{post.draft && <span class="draft-badge">draft</span>}
+								<a
+									href={post.url}
+									target={post.url.startsWith('http') ? '_blank' : undefined}
+									rel={post.url.startsWith('http') ? 'noopener noreferrer' : undefined}
+									itemprop="url"
+									class="post-link"
+								>
+									<span itemprop="headline">{post.title}</span>
+								</a>
+							</div>
+							<meta itemprop="author" content={post.authors.map((a: { name: string }) => a.name).join(', ')} />
 						</article>
 					))
 				}
 			</section>
+			{hasMorePosts && (
+				<a href="/blog" class="view-all-link">View all posts &rarr;</a>
+			)}
 		</nav>
 </Layout>
 
@@ -123,35 +141,54 @@ const jsonLd = {
 	.posts-list {
 		display: flex;
 		flex-direction: column;
-		gap: 0.75rem;
+		gap: 0.5rem;
 	}
 
 	.post-item {
-		display: grid;
-		grid-template-columns: 100px 1fr;
-		gap: 1rem;
-		align-items: baseline;
+		line-height: 1.6;
+	}
+
+	.post-row {
+		display: inline;
 	}
 
 	.post-date {
-		font-size: 0.85rem;
+		font-size: 0.95rem;
 		color: rgb(var(--gray));
-		font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, monospace;
 	}
 
 	.post-link {
+		color: #2563eb;
 		text-decoration: none;
 	}
 
-	.post-title {
-		font-size: 1rem;
-		font-weight: 500;
-		color: rgb(var(--black));
-		transition: color 0.15s ease;
+	.post-link:hover {
+		text-decoration: underline;
 	}
 
-	.post-link:hover .post-title {
-		color: var(--accent);
+	.draft-badge {
+		display: inline-block;
+		background: #f59e0b;
+		color: white;
+		font-size: 0.65rem;
+		padding: 0.1rem 0.35rem;
+		border-radius: 3px;
+		margin-right: 0.3rem;
+		font-weight: 600;
+		text-transform: uppercase;
+		vertical-align: middle;
+	}
+
+	.view-all-link {
+		display: inline-block;
+		margin-top: 1.5rem;
+		color: #2563eb;
+		text-decoration: none;
+		font-size: 0.95rem;
+	}
+
+	.view-all-link:hover {
+		text-decoration: underline;
 	}
 
 	@media (max-width: 720px) {
@@ -160,7 +197,6 @@ const jsonLd = {
 		}
 
 		.post-item {
-			grid-template-columns: 1fr;
 			gap: 0.25rem;
 		}
 

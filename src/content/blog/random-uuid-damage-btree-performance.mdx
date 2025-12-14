@@ -62,7 +62,7 @@ This randomness fundamentally conflicts with B-tree optimization assumptions in 
 
 UUID v4 creates problematic access patterns during reads, as demonstrated in this animation:
 
-<BTreeAnimation client:only="react"
+<BTreeAnimation client:load
   sequence={SEQUENTIAL_ACCESS_SEQUENCE_FOR_CACHE_MISS_SIMULATION}
   autoPlay={true}
   stepDuration={2000}
@@ -141,7 +141,7 @@ In contrast to random identifiers, sequential IDs (such as UUID v7 or auto-incre
 
 The sequential nature ensures records are inserted in order, creating efficient B-tree patterns:
 
-<BTreeAnimation client:only="react"
+<BTreeAnimation client:load
   sequence={SEQUENTIAL_ACCESS_SEQUENCE_FOR_CACHE_HIT_SIMULATION}
   autoPlay={true}
   stepDuration={2000}

@@ -10,8 +10,8 @@
  */
 
 :root {
-	--accent: #2337ff;
-	--accent-dark: #000d8a;
+	--accent: #2563eb;
+	--accent-dark: #1d4ed8;
 	--black: 15, 18, 25;
 	--gray: 96, 115, 159;
 	--gray-light: 229, 233, 240;
@@ -170,7 +170,7 @@ hr {
 }
 @media (max-width: 720px) {
 	body {
-		font-size: 18px;
+		font-size: 16px;
 	}
 	main {
 		padding: 1em;
@@ -250,7 +250,7 @@ ul {
 }
 
 .shelf-title a {
-	color: #0066cc;
+	color: #2563eb;
 	text-decoration: none;
 	margin-left: 0.5rem;
 }

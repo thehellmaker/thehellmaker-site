@@ -1,7 +1,7 @@
 ---
 title: 'Detecting Blocking Calls in Python Asyncio Event Loops'
 description: "How to find synchronous blocking code that's silently killing your asyncio application's performance using sys.setprofile"
-pubDate: 'Dec 14 2024'
+pubDate: 'Dec 14 2025'
 tags: 'python, asyncio, debugging'
 group: 'systems'
 heroImage: '/asyncio-monitor.png'

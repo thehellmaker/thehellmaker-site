@@ -1,6 +1,6 @@
 # Cursor Rules
 
-Astro blog with React components and Tailwind.
+Astro blog with React components and Tailwind. Learning notes written with LLM assistance.
 
 ## Code
 - TypeScript, functional components
@@ -11,3 +11,24 @@ Astro blog with React components and Tailwind.
 - Posts: `src/content/blog/*.md` or `*.mdx`
 - Components: `src/components/`
 - Images: `public/`
+
+## Writing Style
+
+Technical posts. Direct and clean.
+
+### Avoid (LLM tells)
+- Em dashes (—). Use : . , or () instead
+- "Key insight:", "Intuition:", "Let's dive in"
+- "fascinating", "elegant", "powerful", "remarkable"
+- Fake discovery intros ("I wanted to understand...")
+- "Part 1:", "Part 2:" numbered sections
+- Tables and bullets for everything
+- Emojis
+- Summaries that repeat what was said
+
+### Do
+- Say what the post is about upfront
+- Link sources early (repos, videos, papers)
+- Code first, then explanation
+- Short sentences
+- Credit original work

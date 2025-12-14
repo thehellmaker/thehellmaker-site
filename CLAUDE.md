@@ -1,6 +1,6 @@
 # CLAUDE.md
 
-Tech blog built with Astro.
+Tech blog built with Astro. Learning notes written with LLM assistance.
 
 ## Stack
 
@@ -53,3 +53,27 @@ import MyViz from '../../components/blog/MyViz.tsx';
 
 <MyViz client:load />
 ```
+
+## Writing Guidelines
+
+Technical blog posts. Keep it clean and direct.
+
+### Avoid LLM patterns
+- No em dashes (—). Use colons, periods, commas, or parentheses instead
+- No "Key insight:", "Intuition:", "Let's dive in", "In this section we will"
+- No "fascinating", "elegant", "powerful", "exciting", "remarkable"
+- No fake personal discovery intros ("I wanted to understand...", "I was curious about...")
+- No numbered "Part 1:", "Part 2:" headers
+- No excessive bullet points or tables for everything
+- No emojis in technical content
+- No perfect parallel structure in every section
+- No conclusions that summarize everything said above
+
+### Do instead
+- State what the post covers upfront
+- Link to source material (repos, videos, papers) early
+- Show code, then explain it
+- Use short sentences
+- Vary sentence and paragraph structure
+- Be direct about what things are and how they work
+- If referencing someone's work, credit them and link it

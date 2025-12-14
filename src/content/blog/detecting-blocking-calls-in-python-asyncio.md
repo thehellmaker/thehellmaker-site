@@ -35,6 +35,25 @@ The problem with blocking calls:
 
 What I needed was a tool that specifically detects synchronous code running too long *inside* an async context.
 
+## Why asyncio.set_debug() Isn't Enough
+
+Python's asyncio has a built-in debug mode:
+
+```python
+import asyncio
+asyncio.get_event_loop().set_debug(True)
+```
+
+When enabled, it warns you if a callback takes too long:
+
+```
+Executing <Task pending name='Task-1' coro=<main() running at test.py:10>> took 0.150 seconds
+```
+
+The problem? It only tells you *that* blocking happened, not *which specific function* caused it. If your coroutine calls 50 functions and one of them blocks, you still have to hunt through all of them manually.
+
+I needed something that would pinpoint the exact blocking call: `cryptography.hazmat.primitives.hashes.Hash.finalize took 45.23ms`.
+
 ## The Solution: sys.setprofile
 
 Python has a lesser-known debugging hook called `sys.setprofile()`. It registers a callback that fires on every function call, return, and exception in the interpreter.

@@ -8,11 +8,11 @@ heroImage: '/asyncio-monitor.png'
 authors: ['thehellmaker']
 ---
 
-## The Silent Performance Killer
+## Introduction
 
-You've built a beautiful asyncio application. Your handlers are all `async def`. You're using `await` everywhere. Your application should handle thousands of concurrent connections with ease. But something is wrong—requests are timing out, latency is spiking, and your async application feels... synchronous.
+I was debugging an asyncio service that should have handled thousands of concurrent connections easily. All handlers were `async def`, `await` was everywhere, but requests kept timing out and latency was spiking. The application felt synchronous.
 
-The culprit? Hidden synchronous blocking calls buried deep in your codebase or third-party libraries.
+After hours of profiling, I found the culprit: synchronous blocking calls hidden in third-party libraries.
 
 ```python
 async def handle_request(request):
@@ -26,18 +26,18 @@ When synchronous code blocks the event loop, every other coroutine waiting to ru
 
 ## Why This Is Hard to Debug
 
-Blocking calls are insidious because:
+The problem with blocking calls:
 
-1. **The code runs without errors** - Python doesn't complain
-2. **Performance issues appear intermittently** - Only under load
-3. **The blocking code can be anywhere** - In your code, dependencies, or C extensions
-4. **Profilers show wall-clock time** - They can't distinguish "waiting on I/O" from "blocking the loop"
+1. Python doesn't complain - the code runs fine
+2. Issues only show up under load
+3. The blocking code could be anywhere - your code, dependencies, or C extensions
+4. Standard profilers can't distinguish "waiting on I/O" from "blocking the loop"
 
-You need a tool that specifically detects when synchronous code runs for too long *inside* an async context.
+What I needed was a tool that specifically detects synchronous code running too long *inside* an async context.
 
 ## The Solution: sys.setprofile
 
-Python provides a powerful but often overlooked debugging mechanism: `sys.setprofile()`. This function registers a callback that gets invoked on **every** function call, return, and exception in the Python interpreter.
+Python has a lesser-known debugging hook called `sys.setprofile()`. It registers a callback that fires on every function call, return, and exception in the interpreter.
 
 ```python
 def profile_callback(frame, event, arg):
@@ -47,7 +47,7 @@ def profile_callback(frame, event, arg):
     # arg: Return value or exception info
 ```
 
-By hooking into this, we can:
+With this hook, I can:
 1. Record when functions start executing
 2. Measure how long they take
 3. Only flag calls that happen *inside* an async event loop
@@ -55,7 +55,7 @@ By hooking into this, we can:
 
 ## How the Monitor Works
 
-I've released an open-source library called [asyncio-event-loop-monitor](https://github.com/thehellmaker/asyncio-event-loop-monitor) that implements this technique. Here's the core algorithm:
+I built a library called [asyncio-event-loop-monitor](https://github.com/thehellmaker/asyncio-event-loop-monitor) that implements this. Here's the core algorithm:
 
 ### Step 1: Install the Profile Handler
 
@@ -96,9 +96,9 @@ On `"return"` events, we calculate duration and emit a callback if it exceeds th
                 self._on_blocking_call(name, duration_ms)
 ```
 
-### The Key Insight: Skip Coroutines
+### Why We Skip Coroutines
 
-This is crucial. When you call an `async def` function, Python creates a coroutine object. The coroutine's execution time includes time spent *yielded* to the event loop—time when other coroutines can run. This is NOT blocking.
+When you call an `async def` function, Python creates a coroutine object. The coroutine's execution time includes time spent *yielded* to the event loop—time when other coroutines can run. That's not blocking.
 
 ```python
 async def my_coroutine():
@@ -118,9 +118,9 @@ def _is_coroutine(frame):
     ))
 ```
 
-### How Blocking Calls Inside Coroutines ARE Captured
+### Catching Blocking Calls Inside Coroutines
 
-Here's where it gets clever. When a coroutine calls a synchronous function, that sync function's frame does NOT have the coroutine flag:
+But when a coroutine calls a synchronous function, that sync function's frame does NOT have the coroutine flag:
 
 ```python
 async def my_coroutine():       # ← CO_COROUTINE flag = SKIPPED
@@ -153,7 +153,7 @@ WARNING - Event loop blocking detected: myapp.service.process_data took 25.50ms
 
 ### Custom Callbacks
 
-For production use, you'll want to send metrics to your observability platform:
+You can send metrics to your observability platform:
 
 ```python
 from asyncio_event_loop_monitor import event_loop_monitor_ctx, BlockingCallInfo
@@ -183,31 +183,24 @@ with event_loop_monitor_ctx(
     await process_requests()
 ```
 
-## Performance Considerations
+## Performance Overhead
 
-**Warning**: `sys.setprofile` has significant overhead because it's called on EVERY function call and return. Expect:
+`sys.setprofile` has significant overhead since it's called on EVERY function call and return. In my testing:
 
 - 10-30% slowdown on CPU-bound code
 - Higher impact on code with many small function calls
 - Memory overhead for tracking call stacks
 
-### Recommended Use Cases
+This means you shouldn't leave it enabled in production. I use it for:
 
-| Use Case | Why It Works |
-|----------|--------------|
-| **Debugging sessions** | Find blockers quickly, disable after |
-| **CI/testing** | Catch regressions in PRs |
-| **Canary deployments** | Enable on 1% of pods |
-| **On-demand profiling** | Enable via request header |
+- Debugging sessions - find the blockers, then disable
+- CI tests - catch regressions before they hit prod
+- Canary deployments - enable on 1% of pods
+- On-demand profiling via request header (e.g. `X-Enable-Profiling: true`)
 
-### Not Recommended
+## What I Found
 
-- Always-on monitoring in production
-- High-throughput, latency-sensitive paths
-
-## Real-World Example: Finding a Hidden Blocker
-
-I recently used this to debug a service that was mysteriously slow. The monitor revealed:
+Going back to my original problem - the monitor revealed:
 
 ```
 Event loop blocking detected: cryptography.hazmat.primitives.hashes.Hash.finalize took 45.23ms
@@ -235,13 +228,8 @@ Or with uv:
 uv add asyncio-event-loop-monitor
 ```
 
-## Summary
+## Wrapping Up
 
-Blocking calls in asyncio applications are a silent performance killer. The `asyncio-event-loop-monitor` library uses Python's `sys.setprofile` to detect them by:
+The `asyncio-event-loop-monitor` library uses `sys.setprofile` to hook into every function call, track timing only inside event loops, skip coroutines, and emit callbacks when sync calls exceed a threshold.
 
-1. Hooking into every function call and return
-2. Tracking timing only when inside an event loop
-3. Skipping coroutines (they yield, not block)
-4. Emitting callbacks when sync calls exceed a threshold
-
-The code is open-source on [GitHub](https://github.com/thehellmaker/asyncio-event-loop-monitor). Give it a try in your next debugging session—you might be surprised what you find lurking in your async code.
+The code is on [GitHub](https://github.com/thehellmaker/asyncio-event-loop-monitor). It's saved me hours of debugging - hopefully it helps you too.

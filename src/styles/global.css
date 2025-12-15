@@ -9,6 +9,10 @@
   License MIT: https://github.com/HermanMartinus/bearblog/blob/master/LICENSE.md
  */
 
+* {
+	box-sizing: border-box;
+}
+
 :root {
 	--accent: #2563eb;
 	--accent-dark: #1d4ed8;
@@ -35,16 +39,18 @@ body {
 	word-wrap: break-word;
 	overflow-wrap: break-word;
 	color: rgb(var(--gray-dark));
-	font-size: 16px;
-	line-height: 1.6;
+	font-size: 18px;
+	line-height: 1.8;
+	letter-spacing: 0.01em;
 	font-feature-settings: "tnum", "lnum"; /* Enable tabular and lining figures for numbers */
+	overflow-x: hidden;
 }
 
 main {
 	width: 1280px;
-	max-width: calc(100%);
+	max-width: 100%;
 	margin: auto;
-	padding: 2em 0em;
+	padding: 2em 1em;
 }
 
 h1,
@@ -88,10 +94,11 @@ p {
 	margin-bottom: 1em;
 }
 .prose p {
-	margin-top: 1em;
-	margin-bottom: 1em;
+	margin-top: 1.5em;
+	margin-bottom: 1.5em;
 	text-align: justify;
-	line-height: 1.6;
+	line-height: 1.8;
+	letter-spacing: 0.01em;
 }
 textarea {
 	width: 100%;
@@ -170,7 +177,7 @@ hr {
 }
 @media (max-width: 720px) {
 	body {
-		font-size: 16px;
+		font-size: 18px;
 	}
 	main {
 		padding: 1em;
@@ -230,7 +237,9 @@ ul {
 
 .shelf-list {
 	width: 1280px;
+	max-width: 100%;
 	margin: 0 auto;
+	padding: 0 1em;
 }
 
 .shelf-item {

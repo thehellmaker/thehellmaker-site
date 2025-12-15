@@ -88,10 +88,12 @@ const jsonLd = {
 				{
 					displayPosts.map((post) => (
 						<article class="post-item" itemscope itemtype="https://schema.org/BlogPosting">
-							<div class="post-row">
+							<div class="post-date-row">
 								<time datetime={post.pubDate.toISOString()} itemprop="datePublished" class="post-date">
 									<FormattedDate date={post.pubDate} />:
 								</time>
+							</div>
+							<div class="post-title-row">
 								{post.draft && <span class="draft-badge">draft</span>}
 								<a
 									href={post.url}
@@ -103,6 +105,13 @@ const jsonLd = {
 									<span itemprop="headline">{post.title}</span>
 								</a>
 							</div>
+							{post.tags.length > 0 && (
+								<div class="post-tags">
+									{post.tags.map((tag) => (
+										<span class="post-tag">{tag}</span>
+									))}
+								</div>
+							)}
 							<meta itemprop="author" content={post.authors.map((a: { name: string }) => a.name).join(', ')} />
 						</article>
 					))
@@ -145,11 +154,22 @@ const jsonLd = {
 	}
 
 	.post-item {
+		display: grid;
+		grid-template-columns: auto 1fr;
+		gap: 1rem;
 		line-height: 1.6;
+		margin-bottom: 1rem;
 	}
 
-	.post-row {
-		display: inline;
+	.post-date-row {
+		display: flex;
+		align-items: flex-start;
+	}
+
+	.post-title-row {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
 	}
 
 	.post-date {
@@ -179,6 +199,22 @@ const jsonLd = {
 		vertical-align: middle;
 	}
 
+	.post-tags {
+		display: flex;
+		gap: 0.3rem;
+		margin-top: 0.5rem;
+		flex-wrap: wrap;
+	}
+
+	.post-tag {
+		display: inline-block;
+		font-size: 0.75rem;
+		color: rgb(var(--gray));
+		background: rgb(var(--gray-light));
+		padding: 0.1rem 0.4rem;
+		border-radius: 3px;
+	}
+
 	.view-all-link {
 		display: inline-block;
 		margin-top: 1.5rem;
@@ -197,12 +233,12 @@ const jsonLd = {
 		}
 
 		.post-item {
+			grid-template-columns: 1fr;
 			gap: 0.25rem;
 		}
 
 		.post-date {
-			order: 2;
-			font-size: 0.8rem;
+			font-size: 0.9rem;
 		}
 	}
 </style>

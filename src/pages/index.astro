@@ -93,25 +93,27 @@ const jsonLd = {
 									<FormattedDate date={post.pubDate} />:
 								</time>
 							</div>
-							<div class="post-title-row">
-								{post.draft && <span class="draft-badge">draft</span>}
-								<a
-									href={post.url}
-									target={post.url.startsWith('http') ? '_blank' : undefined}
-									rel={post.url.startsWith('http') ? 'noopener noreferrer' : undefined}
-									itemprop="url"
-									class="post-link"
-								>
-									<span itemprop="headline">{post.title}</span>
-								</a>
-							</div>
-							{post.tags.length > 0 && (
-								<div class="post-tags">
-									{post.tags.map((tag) => (
-										<span class="post-tag">{tag}</span>
-									))}
+							<div class="post-content-column">
+								<div class="post-title-row">
+									{post.draft && <span class="draft-badge">draft</span>}
+									<a
+										href={post.url}
+										target={post.url.startsWith('http') ? '_blank' : undefined}
+										rel={post.url.startsWith('http') ? 'noopener noreferrer' : undefined}
+										itemprop="url"
+										class="post-link"
+									>
+										<span itemprop="headline">{post.title}</span>
+									</a>
 								</div>
-							)}
+								{post.tags.length > 0 && (
+									<div class="post-tags">
+										{post.tags.map((tag) => (
+											<span class="post-tag">{tag}</span>
+										))}
+									</div>
+								)}
+							</div>
 							<meta itemprop="author" content={post.authors.map((a: { name: string }) => a.name).join(', ')} />
 						</article>
 					))
